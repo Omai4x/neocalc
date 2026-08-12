@@ -1,5 +1,5 @@
 {
-  "_comment": "The only file you edit to ship a new version. Paste the Cloudinary URLs here and the page updates itself: version number, download buttons, file sizes and the release date all read from this.",
+  "_comment": "The only file to edit when shipping. Builds are attached to the matching GitHub release, so the URLs follow one pattern: https://github.com/Omai4x/neocalc/releases/download/v<version>/<file>. Bump version and released, point the urls at the new tag, and the page updates itself: heading, buttons, sizes and changelog.",
   "version": "1.3",
   "released": "2026-08-12",
   "minAndroid": "6.0",
@@ -10,21 +10,21 @@
       "arch": "arm64-v8a",
       "size": "14 MB",
       "recommended": true,
-      "url": "https://res.cloudinary.com/YOUR_CLOUD_NAME/raw/upload/neocalc/NeoCalc-1.3-arm64-v8a.apk"
+      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3/NeoCalc-1.3-arm64-v8a.apk"
     },
     {
       "label": "Older 32-bit phones",
       "arch": "armeabi-v7a",
       "size": "9.9 MB",
       "recommended": false,
-      "url": "https://res.cloudinary.com/YOUR_CLOUD_NAME/raw/upload/neocalc/NeoCalc-1.3-armeabi-v7a.apk"
+      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3/NeoCalc-1.3-armeabi-v7a.apk"
     },
     {
       "label": "Every architecture",
       "arch": "universal",
       "size": "43 MB",
       "recommended": false,
-      "url": "https://res.cloudinary.com/YOUR_CLOUD_NAME/raw/upload/neocalc/NeoCalc-1.3-universal.apk"
+      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3/NeoCalc-1.3-universal.apk"
     }
   ],
   "changes": [

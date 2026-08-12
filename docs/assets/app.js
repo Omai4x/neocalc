@@ -11,6 +11,8 @@ const issues = document.getElementById('issues-link');
 if (issues) issues.href = REPO + '/issues';
 const ds = document.getElementById('ds-link');
 if (ds) ds.href = REPO + '/blob/main/design-system/neocalc/MASTER.md';
+const rel = document.getElementById('releases-link');
+if (rel) rel.href = REPO + '/releases';
 
 /** Anything from the manifest is escaped before it reaches the DOM. */
 function esc(value) {
