@@ -36,8 +36,8 @@ android {
         applicationId = "com.omai.neocalc"
         minSdk = 23
         targetSdk = 37
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 5
+        versionName = "1.3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

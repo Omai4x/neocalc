@@ -141,6 +141,15 @@ object ReleaseNotes {
 
     val ALL: List<Release> = listOf(
         Release(
+            version = "1.3.1",
+            date = "13 August 2026",
+            headline = "Fixes a crash on launch.",
+            changes = listOf(
+                "1.3 could not start at all once it was minified for release: the optimiser removed a class that the background scheduler looks up by name, and the app died before drawing a frame. It is kept now.",
+                "Rate alerts would have failed the same way even after launching, because the worker is also found by name. Also kept.",
+            ),
+        ),
+        Release(
             version = "1.3",
             date = "12 August 2026",
             headline = "A new look, built around the numbers.",
