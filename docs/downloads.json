@@ -1,0 +1,36 @@
+{
+  "_comment": "The only file you edit to ship a new version. Paste the Cloudinary URLs here and the page updates itself: version number, download buttons, file sizes and the release date all read from this.",
+  "version": "1.3",
+  "released": "2026-08-12",
+  "minAndroid": "6.0",
+  "headline": "A new look, built around the numbers.",
+  "builds": [
+    {
+      "label": "Most phones",
+      "arch": "arm64-v8a",
+      "size": "14 MB",
+      "recommended": true,
+      "url": "https://res.cloudinary.com/YOUR_CLOUD_NAME/raw/upload/neocalc/NeoCalc-1.3-arm64-v8a.apk"
+    },
+    {
+      "label": "Older 32-bit phones",
+      "arch": "armeabi-v7a",
+      "size": "9.9 MB",
+      "recommended": false,
+      "url": "https://res.cloudinary.com/YOUR_CLOUD_NAME/raw/upload/neocalc/NeoCalc-1.3-armeabi-v7a.apk"
+    },
+    {
+      "label": "Every architecture",
+      "arch": "universal",
+      "size": "43 MB",
+      "recommended": false,
+      "url": "https://res.cloudinary.com/YOUR_CLOUD_NAME/raw/upload/neocalc/NeoCalc-1.3-universal.apk"
+    }
+  ],
+  "changes": [
+    "Redesigned around operation orange: the operator keys are the only ones that change what the next digit means, so they are the only ones that pull the eye.",
+    "Digits no longer shift as a result updates.",
+    "Every colour pair meets WCAG AA contrast, in both light and dark.",
+    "Animations stop completely when your device is set to remove them."
+  ]
+}

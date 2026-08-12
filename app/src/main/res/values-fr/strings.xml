@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Français. Le nom de l'application n'est pas traduit, et les codes de devise
+  (USD, EUR) sont ceux de l'ISO 4217 : identiques dans toutes les langues.
+-->
+<resources>
+    <string name="error_divide_by_zero">Division par zéro impossible</string>
+    <string name="error_invalid_input">Non défini pour cette valeur</string>
+    <string name="error_overflow">Résultat trop grand</string>
+    <string name="result_description">Résultat %1$s</string>
+    <string name="angle_mode_degrees">Angles en degrés. Touchez pour les radians</string>
+    <string name="angle_mode_radians">Angles en radians. Touchez pour les degrés</string>
+    <string name="memory_indicator">La mémoire contient une valeur. Touchez pour la rappeler</string>
+    <string name="scientific_toggle">Fonctions scientifiques</string>
+    <string name="convert_this">Convertir ce résultat dans une autre devise</string>
+
+    <string name="nav_calculator">Calc</string>
+    <string name="nav_convert">Convertir</string>
+    <string name="about_open">À propos, confidentialité et nouveautés</string>
+    <string name="nav_split">Partager</string>
+    <string name="nav_history">Historique</string>
+
+    <string name="convert_currency">Devise</string>
+    <string name="convert_units">Unités</string>
+    <string name="convert_amount">Montant</string>
+    <string name="convert_from">De</string>
+    <string name="convert_to">Vers</string>
+    <string name="convert_refresh">Actualiser les taux</string>
+    <string name="rates_updated">Mis à jour le %1$s</string>
+    <string name="rates_loading">Récupération des derniers taux…</string>
+    <string name="rates_failed">Service de taux injoignable. Vérifiez votre connexion.</string>
+    <string name="currency_select">Choisir la devise %1$s</string>
+    <string name="currency_search_hint">Rechercher un code ou un pays</string>
+    <string name="currency_search_empty">Aucune devise ne correspond à « %1$s »</string>
+    <string name="currency_pinned">Épinglées</string>
+    <string name="currency_recent">Récentes</string>
+    <string name="currency_all">Toutes les devises</string>
+    <string name="rates_offline_today">Hors ligne · taux enregistrés aujourd\'hui</string>
+    <string name="amount_invalid">Cette expression ne fonctionne pas</string>
+    <string name="board_title">Équivaut aussi, depuis %1$s</string>
+    <string name="board_hint">Épinglez une devise dans la liste pour l\'ajouter au tableau</string>
+    <string name="trend_window">%1$s vers %2$s · 30 jours</string>
+    <string name="trend_low">Plus bas %1$s</string>
+    <string name="trend_high">Plus haut %1$s</string>
+    <string name="clipboard_detected">Convertir %1$s depuis le presse-papiers</string>
+
+    <string name="widget_label">Taux de change</string>
+    <string name="widget_description">Le taux de votre dernière paire convertie, actualisé au fil de la journée.</string>
+    <string name="widget_no_rate">-</string>
+    <string name="widget_today">Mis à jour aujourd\'hui</string>
+    <string name="widget_tap_to_open">Touchez pour choisir une paire</string>
+
+    <string name="split_bill_total">Total de l\'addition</string>
+    <string name="split_people">Partager entre</string>
+    <string name="split_tip">Pourboire</string>
+    <string name="split_tax">Taxe</string>
+    <string name="split_each">Chacun paie</string>
+    <string name="split_subtotal">Sous-total</string>
+    <string name="split_total">Total</string>
+    <string name="split_round_up">Arrondir</string>
+    <string name="split_tip_on_tax">Pourboire sur la taxe</string>
+    <string name="split_ways">Partagé en %1$d</string>
+    <string name="split_mode_even">Parts égales</string>
+    <string name="split_mode_items">Par consommation</string>
+    <string name="split_items">Ce que chacun a pris</string>
+    <string name="split_person">Personne %1$d</string>
+    <string name="split_add_person">Ajouter une personne</string>
+    <string name="split_uneven">%1$d paient %2$s, les autres %3$s</string>
+
+    <string name="alerts_channel">Alertes de taux</string>
+    <string name="alerts_channel_description">Se déclenche quand une paire surveillée franchit votre seuil.</string>
+    <string name="alerts_fired_title">%1$s vers %2$s</string>
+    <string name="alerts_fired_body">Maintenant %1$s. Vous vouliez être prévenu quand ce serait %2$s.</string>
+    <string name="alerts_title">Alertes de taux</string>
+    <string name="alerts_add">Me prévenir</string>
+    <string name="alerts_above">au-dessus de</string>
+    <string name="alerts_below">en dessous de</string>
+    <string name="alerts_empty">Aucune alerte. Fixez un seuil et l\'application le surveillera.</string>
+    <string name="alerts_permission">Autorisez les notifications pour recevoir les alertes.</string>
+    <string name="tile_label">Convertir</string>
+
+    <string name="scan_price">Scanner un prix</string>
+    <string name="scan_failed">Aucun prix trouvé sur cette photo.</string>
+    <string name="scan_reading">Lecture de la photo…</string>
+    <string name="smart_hint">Essayez « 300 dollars en euros » ou « 20% de remise sur 45 »</string>
+    <string name="smart_not_understood">Je n\'ai pas compris. Essayez « 50 usd en eur ».</string>
+    <string name="smart_dismiss">Masquer</string>
+
+    <string name="units_custom">Vos propres unités</string>
+    <string name="units_custom_add">Ajouter une unité</string>
+    <string name="units_custom_name">Nom</string>
+    <string name="units_custom_symbol">Symbole</string>
+    <string name="units_custom_amount">Combien</string>
+    <string name="units_custom_of">de</string>
+    <string name="units_custom_empty">Définissez votre unité, par exemple 1 caisse = 24 bouteilles.</string>
+    <string name="units_custom_save">Enregistrer l\'unité</string>
+
+    <string name="backup_title">Vos données</string>
+    <string name="backup_export">Tout exporter</string>
+    <string name="backup_export_detail">Épinglées, unités, alertes et historique, dans un seul fichier</string>
+    <string name="backup_import">Importer une sauvegarde</string>
+    <string name="backup_import_detail">Restaurer depuis un fichier exporté auparavant</string>
+    <string name="backup_csv">Exporter l\'historique en CSV</string>
+    <string name="backup_csv_detail">Pour un tableur, pas pour restaurer</string>
+    <string name="backup_exported">Enregistré.</string>
+    <string name="backup_failed">Ce fichier n\'a pas pu être utilisé.</string>
+    <string name="backup_imported">Restauré : %1$d épinglées, %2$d unités, %3$d alertes, %4$d entrées.</string>
+
+    <string name="history_empty">Rien pour l\'instant. Vos résultats apparaîtront ici.</string>
+    <string name="history_clear">Effacer l\'historique</string>
+    <string name="history_reuse">Touchez un résultat pour le réutiliser</string>
+
+    <plurals name="rates_offline_days">
+        <item quantity="many">Hors ligne · taux enregistrés il y a %1$d de jours</item>
+        <item quantity="one">Hors ligne · taux enregistrés il y a %1$d jour</item>
+        <item quantity="other">Hors ligne · taux enregistrés il y a %1$d jours</item>
+    </plurals>
+    <plurals name="widget_days_ago">
+        <item quantity="many">%1$d de jours</item>
+        <item quantity="one">%1$d jour</item>
+        <item quantity="other">%1$d jours</item>
+    </plurals>
+</resources>

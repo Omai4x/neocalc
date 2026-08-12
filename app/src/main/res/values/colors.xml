@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Only the window background lives here - everything else is defined in Compose
+  (ui/theme/Color.kt). These two exist so the window painted before the first
+  Compose frame already matches the app, instead of flashing white.
+  Note: "void" would collide with a Java keyword in R, hence "ground_*".
+-->
+<resources>
+    <color name="ground_dark">#FF05070A</color>
+    <color name="ground_light">#FFF6F8FA</color>
+
+    <!--
+      The widget draws in the launcher, where the app theme does not apply and
+      RemoteViews cannot read theme attributes. These are literal colours with a
+      values-night variant, which is the only theming a widget gets.
+ -->
+    <color name="widget_surface">#FFFFFFFF</color>
+    <color name="widget_outline">#22000000</color>
+    <color name="widget_text">#FF0B1220</color>
+    <color name="widget_muted">#FF5B6675</color>
+</resources>

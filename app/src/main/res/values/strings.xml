@@ -1,0 +1,146 @@
+<resources>
+    <!-- A brand name, the same in every language. -->
+    <string name="app_name" translatable="false">NeoCalc</string>
+
+    <!-- Calculator -->
+    <string name="error_divide_by_zero">Can\'t divide by zero</string>
+    <string name="error_invalid_input">Not defined for that input</string>
+    <string name="error_overflow">Result too large</string>
+    <!-- Spoken by TalkBack for the result line, e.g. "Result 56". -->
+    <string name="result_description">Result %1$s</string>
+    <string name="angle_mode_degrees">Angle mode: degrees. Tap for radians</string>
+    <string name="angle_mode_radians">Angle mode: radians. Tap for degrees</string>
+    <string name="memory_indicator">Memory holds a value. Tap to recall</string>
+    <string name="scientific_toggle">Scientific functions</string>
+    <string name="convert_this">Convert this result to another currency</string>
+
+    <!-- Navigation -->
+    <string name="nav_calculator">Calc</string>
+    <string name="nav_convert">Convert</string>
+    <string name="about_open">About, privacy and what\'s new</string>
+    <string name="nav_split">Split</string>
+    <string name="nav_history">History</string>
+
+    <!-- Convert -->
+    <string name="convert_currency">Currency</string>
+    <string name="convert_units">Units</string>
+    <string name="convert_amount">Amount</string>
+    <string name="convert_from">From</string>
+    <string name="convert_to">To</string>
+    <string name="convert_refresh">Refresh rates</string>
+    <string name="rates_updated">Updated %1$s</string>
+    <string name="rates_loading">Fetching latest rates…</string>
+    <string name="rates_failed">Couldn\'t reach the rate service. Check your connection.</string>
+    <!-- e.g. "Select from currency" -->
+    <string name="currency_select">Select %1$s currency</string>
+    <string name="currency_search_hint">Search code or country</string>
+    <string name="currency_search_empty">No currency matches “%1$s”</string>
+    <string name="currency_pinned">Pinned</string>
+    <string name="currency_recent">Recent</string>
+    <string name="currency_all">All currencies</string>
+
+    <!-- Offline cache -->
+    <string name="rates_offline_today">Offline · using today\'s saved rates</string>
+
+    <!-- Amount field -->
+    <string name="amount_invalid">That expression doesn\'t work out</string>
+
+    <!-- Board -->
+    <string name="board_title">Also worth, from %1$s</string>
+    <string name="board_hint">Star a currency in the picker to put it on the board</string>
+
+    <!-- Trend -->
+    <string name="trend_window">%1$s → %2$s · 30 days</string>
+    <string name="trend_low">Low %1$s</string>
+    <string name="trend_high">High %1$s</string>
+
+    <!-- Clipboard -->
+    <string name="clipboard_detected">Convert %1$s from your clipboard</string>
+
+    <!-- Widget -->
+    <string name="widget_label">Exchange rate</string>
+    <string name="widget_description">The rate for your last converted pair, updated through the day.</string>
+    <string name="widget_no_rate">-</string>
+    <string name="widget_today">Updated today</string>
+    <string name="widget_tap_to_open">Tap to set a pair</string>
+
+    <!-- Split -->
+    <string name="split_bill_total">Bill total</string>
+    <string name="split_people">Split between</string>
+    <string name="split_tip">Tip</string>
+    <string name="split_tax">Tax</string>
+    <string name="split_each">Each person pays</string>
+    <string name="split_subtotal">Subtotal</string>
+    <string name="split_total">Total</string>
+    <string name="split_round_up">Round up</string>
+    <string name="split_tip_on_tax">Tip on tax</string>
+    <string name="split_ways">Split %1$d ways</string>
+    <string name="split_mode_even">Even split</string>
+    <string name="split_mode_items">By item</string>
+    <string name="split_items">What each person had</string>
+    <string name="split_person">Person %1$d</string>
+    <string name="split_add_person">Add a person</string>
+    <string name="split_uneven">%1$d pay %2$s, the rest pay %3$s</string>
+
+    <!-- Alerts -->
+    <string name="alerts_channel">Rate alerts</string>
+    <string name="alerts_channel_description">Fires when a pair you are watching crosses your target.</string>
+    <string name="alerts_fired_title">%1$s to %2$s</string>
+    <string name="alerts_fired_body">Now %1$s. You asked to be told when it went %2$s.</string>
+    <string name="alerts_title">Rate alerts</string>
+    <string name="alerts_add">Alert me when</string>
+    <string name="alerts_above">goes above</string>
+    <string name="alerts_below">goes below</string>
+    <string name="alerts_empty">No alerts yet. Set a target and the app will watch it for you.</string>
+    <string name="alerts_permission">Allow notifications so alerts can reach you.</string>
+    <string name="tile_label">Convert</string>
+
+    <!-- Scan -->
+    <string name="scan_price">Scan a price</string>
+    <string name="scan_failed">No price found in that photo.</string>
+
+    <!-- Smart input -->
+    <string name="smart_hint">Try \"300 dollars in naira\" or \"20% off 45\"</string>
+
+    <string name="smart_not_understood">Not sure what that means. Try \"50 usd in eur\".</string>
+    <string name="smart_dismiss">Dismiss</string>
+    <string name="scan_reading">Reading the photo…</string>
+    <string name="units_custom">Your own units</string>
+    <string name="units_custom_add">Add a unit</string>
+    <string name="units_custom_name">Name</string>
+    <string name="units_custom_symbol">Symbol</string>
+    <string name="units_custom_amount">How many</string>
+    <string name="units_custom_of">of</string>
+    <string name="units_custom_empty">Define a unit of your own, like 1 crate = 24 bottles.</string>
+    <string name="units_custom_save">Save unit</string>
+
+    <!-- Backup -->
+    <string name="backup_title">Your data</string>
+    <string name="backup_export">Export everything</string>
+    <string name="backup_export_detail">Pins, custom units, alerts and history, as one file</string>
+    <string name="backup_import">Import a backup</string>
+    <string name="backup_import_detail">Restore from a file you exported earlier</string>
+    <string name="backup_csv">Export history as CSV</string>
+    <string name="backup_csv_detail">For a spreadsheet, rather than for restoring</string>
+    <string name="backup_exported">Saved.</string>
+    <string name="backup_failed">That file could not be used.</string>
+    <string name="backup_imported">Restored %1$d pinned, %2$d units, %3$d alerts, %4$d history entries.</string>
+
+    <!-- History -->
+    <string name="history_empty">Nothing yet. Results you calculate will appear here.</string>
+    <string name="history_clear">Clear history</string>
+    <string name="history_reuse">Tap a result to reuse it</string>
+
+    <!--
+      Real plurals rather than "day(s)": the one/other split is wrong in plenty of
+      languages, and this is the resource type that lets translators fix it.
+ -->
+    <plurals name="rates_offline_days">
+        <item quantity="one">Offline · rates saved %1$d day ago</item>
+        <item quantity="other">Offline · rates saved %1$d days ago</item>
+    </plurals>
+    <plurals name="widget_days_ago">
+        <item quantity="one">%1$d day old</item>
+        <item quantity="other">%1$d days old</item>
+    </plurals>
+</resources>

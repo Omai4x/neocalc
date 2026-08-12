@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeoCalc - a calculator that also does money</title>
+<meta name="description" content="Scientific calculator, 162 currencies that work offline, and a bill splitter that adds up to the penny. No account, no tracking, no ads. Free and open source for Android.">
+<meta name="theme-color" content="#1c1917">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="NeoCalc - a calculator that also does money">
+<meta property="og:description" content="Scientific calculator, 162 currencies offline, bill splitter. No account, no tracking, no ads.">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="./">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3" y="2" width="18" height="20" rx="4" stroke="#ea580c" stroke-width="2"/>
+        <rect x="6.5" y="5.5" width="11" height="4" rx="1" fill="#ea580c"/>
+        <circle cx="8" cy="13.5" r="1.3" fill="#a8a29e"/>
+        <circle cx="12" cy="13.5" r="1.3" fill="#a8a29e"/>
+        <circle cx="16" cy="13.5" r="1.3" fill="#ea580c"/>
+        <circle cx="8" cy="17.5" r="1.3" fill="#a8a29e"/>
+        <circle cx="12" cy="17.5" r="1.3" fill="#a8a29e"/>
+        <circle cx="16" cy="17.5" r="1.3" fill="#ea580c"/>
+      </svg>
+      NeoCalc
+    </a>
+    <nav>
+      <a class="hide-sm" href="#features">Features</a>
+      <a class="hide-sm" href="#privacy">Privacy</a>
+      <a href="#download">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <span class="eyebrow">Free &amp; open source</span>
+      <h1>A calculator that also does <em>money</em>.</h1>
+      <p class="lede">
+        Proper operator precedence and brackets. 162 currencies that keep working
+        when the signal doesn't. A bill splitter that adds up to the penny, every
+        time. No account, no tracking, no ads.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#download">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Download for Android
+        </a>
+        <a class="btn btn-ghost" id="source-link" href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="m8 17-5-5 5-5m8 0 5 5-5 5" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          View the source
+        </a>
+      </div>
+      <p class="hero-note num">
+        Version <span data-version>1.3</span> &middot; Android <span data-min-android>6.0</span> and up &middot; APK, no store required
+      </p>
+    </div>
+
+    <div class="stage">
+      <!-- Drawn in CSS, not screenshotted: it cannot go stale when a token changes. -->
+      <div class="phone" role="img" aria-label="The NeoCalc calculator screen, showing 128 multiplied by 8 equals 1,024, with orange operator keys.">
+        <div class="notch"></div>
+        <div class="chips">
+          <span class="chip on">DEG</span>
+          <span class="chip">M</span>
+          <span class="chip on push">f(x)</span>
+        </div>
+        <div class="readout">
+          <div class="expr num">128 &times;</div>
+          <div class="answer num">1,024</div>
+        </div>
+        <div class="pad">
+          <div class="key fn">(</div><div class="key fn">)</div><div class="key fn">x&#x02B8;</div><div class="key fn">&radic;</div>
+          <div class="key fn">AC</div><div class="key fn">&plusmn;</div><div class="key fn">%</div><div class="key op">&divide;</div>
+          <div class="key num">7</div><div class="key num">8</div><div class="key num">9</div><div class="key op">&times;</div>
+          <div class="key num">4</div><div class="key num">5</div><div class="key num">6</div><div class="key op">&minus;</div>
+          <div class="key num">1</div><div class="key num">2</div><div class="key num">3</div><div class="key op">+</div>
+          <div class="key num">0</div><div class="key">.</div><div class="key fn">&#9003;</div><div class="key eq">=</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Everything a calculator should have been.</h2>
+        <p>
+          Most calculator apps answer 20 for 2&nbsp;+&nbsp;3&nbsp;&times;&nbsp;4.
+          This one answers 14, and gives you brackets when you need to say
+          otherwise.
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 12h10M9 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Real precedence</h3>
+          <p>Multiplication before addition, brackets on the main keypad, and a depth indicator you can tap to close them.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <h3>162 currencies</h3>
+          <p>Search by code, name or country. Bitcoin, Ethereum and gold sit alongside the fiat. Pin the ones you use.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 15a5 5 0 0 1 4-4.9 6 6 0 0 1 11.6 1.4A4 4 0 0 1 18 19H7a4 4 0 0 1-4-4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m4 4 16 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Works on a plane</h3>
+          <p>Rates are saved the moment they arrive. A cold start with no signal still answers, and tells you how old the numbers are.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8h6M9 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Split to the penny</h3>
+          <p>Tip, tax and round-up. When 100 splits three ways, it shows you who pays the extra penny rather than losing it.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.4 6.6L22 12l-6.6 2.4L13 21l-2.4-6.6L4 12l6.6-2.4L13 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Ask in plain words</h3>
+          <p>&ldquo;300 dollars in naira&rdquo;. &ldquo;20% off 45&rdquo;. &ldquo;15 miles in km&rdquo;. Or point the camera at a price tag.</p>
+        </article>
+
+        <article class="card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 17V9m5 8V5m5 12v-6m5 6V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Rate alerts</h3>
+          <p>Watch a pair in the background and get told once when it crosses your target. Not once an hour, forever.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="download">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Download</h2>
+        <p>
+          Version <span class="num" data-version>1.3</span>, released
+          <span class="num" data-released>2026-08-12</span>.
+          Pick the first one unless you know your phone is older than about 2015.
+        </p>
+      </div>
+
+      <div class="grid" style="margin-top:32px">
+        <div class="card">
+          <div class="dl-head">
+            <strong>Get the app</strong>
+            <span class="badge" data-version-badge>v1.3</span>
+          </div>
+          <div id="builds" class="cta-row" style="margin:0;flex-direction:column;align-items:stretch">
+            <p class="meta">Loading builds&hellip;</p>
+          </div>
+          <p class="install">
+            <strong>Installing an APK:</strong> open the file and Android will ask
+            once whether to allow installs from your browser. The app is signed
+            with the same key every release, so updates install over the top.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="dl-head">
+            <strong>What&rsquo;s new</strong>
+            <span class="meta num" data-released>2026-08-12</span>
+          </div>
+          <ul class="changes" id="changes"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>It collects nothing. Genuinely nothing.</h2>
+        <p>
+          Not a soft version of that claim. There is no analytics library, no
+          advertising, no crash reporting, and no account to make.
+        </p>
+      </div>
+      <ul class="privacy-list">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Your calculations, history and settings never leave the device. Cloud backup is switched off for this app&rsquo;s data on purpose.</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>The only outbound request is for exchange rates, and it carries no identifier.</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Scanning a price runs on the device. The photo is never uploaded and never stored.</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>The source is public, so none of the above has to be taken on trust.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>NeoCalc &middot; free and open source</span>
+    <nav>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a id="source-link-foot" href="#">Source</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

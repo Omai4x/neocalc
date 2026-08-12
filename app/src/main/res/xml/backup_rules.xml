@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cloud backup rules for Android 11 and below.
+
+  The privacy policy states that this app's data stays on the device and is
+  never uploaded. Leaving auto-backup at its default would quietly contradict
+  that: every SharedPreferences file, including the history tape and the saved
+  rates, would be copied to the user's Google Drive. So nothing is included.
+
+  The cost of excluding it is that a new device starts fresh, which is why the
+  app offers an explicit export instead: a backup the user chooses, to a file
+  they control, rather than one that happens to them.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="file" path="." />
+</full-backup-content>

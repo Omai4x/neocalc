@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pre-API-26 launchers don't understand <adaptive-icon>, so the same two vector
+  layers are composed by hand here. Density-independent: one vector scales to
+  every bucket, which is why the generated .webp set is gone.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_launcher_background" />
+    <!-- Inset matches the adaptive-icon safe zone so both paths look identical. -->
+    <item
+        android:drawable="@drawable/ic_launcher_foreground"
+        android:left="-8dp"
+        android:top="-8dp"
+        android:right="-8dp"
+        android:bottom="-8dp" />
+</layer-list>

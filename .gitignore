@@ -1,0 +1,27 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Release signing — never commit the key or its passwords
+release.keystore
+*.keystore
+*.jks
+keystore.properties
+
+# Release artifacts are hosted on Cloudinary, not in the repo. They are large,
+# they change every build, and git is the wrong place for a binary that can be
+# rebuilt from the source beside it.
+/*.apk
+/*.aab

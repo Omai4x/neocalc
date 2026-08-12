@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark counterparts for the widget; see values/colors.xml for why these are literals. -->
+<resources>
+    <color name="widget_surface">#FF11161F</color>
+    <color name="widget_outline">#33FFFFFF</color>
+    <color name="widget_text">#FFEDF1F7</color>
+    <color name="widget_muted">#FF98A2B3</color>
+</resources>

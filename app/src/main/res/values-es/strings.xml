@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Castellano. El nombre de la app no se traduce, y los códigos de moneda (USD,
+  EUR) son ISO 4217: son los mismos en todos los idiomas.
+-->
+<resources>
+    <string name="error_divide_by_zero">No se puede dividir entre cero</string>
+    <string name="error_invalid_input">No definido para ese valor</string>
+    <string name="error_overflow">Resultado demasiado grande</string>
+    <string name="result_description">Resultado %1$s</string>
+    <string name="angle_mode_degrees">Ángulos en grados. Toca para radianes</string>
+    <string name="angle_mode_radians">Ángulos en radianes. Toca para grados</string>
+    <string name="memory_indicator">La memoria tiene un valor. Toca para recuperarlo</string>
+    <string name="scientific_toggle">Funciones científicas</string>
+    <string name="convert_this">Convertir este resultado a otra moneda</string>
+
+    <string name="nav_calculator">Calc</string>
+    <string name="nav_convert">Convertir</string>
+    <string name="about_open">Acerca de, privacidad y novedades</string>
+    <string name="nav_split">Dividir</string>
+    <string name="nav_history">Historial</string>
+
+    <string name="convert_currency">Moneda</string>
+    <string name="convert_units">Unidades</string>
+    <string name="convert_amount">Cantidad</string>
+    <string name="convert_from">De</string>
+    <string name="convert_to">A</string>
+    <string name="convert_refresh">Actualizar tasas</string>
+    <string name="rates_updated">Actualizado %1$s</string>
+    <string name="rates_loading">Obteniendo las últimas tasas…</string>
+    <string name="rates_failed">No se pudo conectar con el servicio de tasas. Revisa tu conexión.</string>
+    <string name="currency_select">Elegir moneda de %1$s</string>
+    <string name="currency_search_hint">Busca por código o país</string>
+    <string name="currency_search_empty">Ninguna moneda coincide con «%1$s»</string>
+    <string name="currency_pinned">Fijadas</string>
+    <string name="currency_recent">Recientes</string>
+    <string name="currency_all">Todas las monedas</string>
+    <string name="rates_offline_today">Sin conexión · usando las tasas guardadas hoy</string>
+    <string name="amount_invalid">Esa expresión no cuadra</string>
+    <string name="board_title">También equivale, desde %1$s</string>
+    <string name="board_hint">Marca una moneda con la estrella para añadirla al panel</string>
+    <string name="trend_window">%1$s a %2$s · 30 días</string>
+    <string name="trend_low">Mínimo %1$s</string>
+    <string name="trend_high">Máximo %1$s</string>
+    <string name="clipboard_detected">Convertir %1$s del portapapeles</string>
+
+    <string name="widget_label">Tipo de cambio</string>
+    <string name="widget_description">La tasa del último par convertido, actualizada durante el día.</string>
+    <string name="widget_no_rate">-</string>
+    <string name="widget_today">Actualizado hoy</string>
+    <string name="widget_tap_to_open">Toca para elegir un par</string>
+
+    <string name="split_bill_total">Total de la cuenta</string>
+    <string name="split_people">Dividir entre</string>
+    <string name="split_tip">Propina</string>
+    <string name="split_tax">Impuesto</string>
+    <string name="split_each">Cada persona paga</string>
+    <string name="split_subtotal">Subtotal</string>
+    <string name="split_total">Total</string>
+    <string name="split_round_up">Redondear</string>
+    <string name="split_tip_on_tax">Propina sobre impuesto</string>
+    <string name="split_ways">Dividido entre %1$d</string>
+    <string name="split_mode_even">Partes iguales</string>
+    <string name="split_mode_items">Por consumo</string>
+    <string name="split_items">Qué tomó cada persona</string>
+    <string name="split_person">Persona %1$d</string>
+    <string name="split_add_person">Añadir persona</string>
+    <string name="split_uneven">%1$d pagan %2$s, el resto paga %3$s</string>
+
+    <string name="alerts_channel">Avisos de tasas</string>
+    <string name="alerts_channel_description">Se activa cuando un par que vigilas cruza tu objetivo.</string>
+    <string name="alerts_fired_title">%1$s a %2$s</string>
+    <string name="alerts_fired_body">Ahora %1$s. Pediste aviso cuando fuera %2$s.</string>
+    <string name="alerts_title">Avisos de tasas</string>
+    <string name="alerts_add">Avísame</string>
+    <string name="alerts_above">si sube de</string>
+    <string name="alerts_below">si baja de</string>
+    <string name="alerts_empty">Aún no hay avisos. Fija un objetivo y la app lo vigilará por ti.</string>
+    <string name="alerts_permission">Permite las notificaciones para recibir los avisos.</string>
+    <string name="tile_label">Convertir</string>
+
+    <string name="scan_price">Escanear un precio</string>
+    <string name="scan_failed">No se encontró ningún precio en esa foto.</string>
+    <string name="scan_reading">Leyendo la foto…</string>
+    <string name="smart_hint">Prueba «300 dólares en pesos» o «20% de descuento en 45»</string>
+    <string name="smart_not_understood">No entiendo eso. Prueba «50 usd en eur».</string>
+    <string name="smart_dismiss">Descartar</string>
+
+    <string name="units_custom">Tus propias unidades</string>
+    <string name="units_custom_add">Añadir unidad</string>
+    <string name="units_custom_name">Nombre</string>
+    <string name="units_custom_symbol">Símbolo</string>
+    <string name="units_custom_amount">Cuántos</string>
+    <string name="units_custom_of">de</string>
+    <string name="units_custom_empty">Define tu propia unidad, por ejemplo 1 caja = 24 botellas.</string>
+    <string name="units_custom_save">Guardar unidad</string>
+
+    <string name="backup_title">Tus datos</string>
+    <string name="backup_export">Exportar todo</string>
+    <string name="backup_export_detail">Fijadas, unidades propias, avisos e historial, en un archivo</string>
+    <string name="backup_import">Importar una copia</string>
+    <string name="backup_import_detail">Restaurar desde un archivo que exportaste antes</string>
+    <string name="backup_csv">Exportar historial como CSV</string>
+    <string name="backup_csv_detail">Para una hoja de cálculo, no para restaurar</string>
+    <string name="backup_exported">Guardado.</string>
+    <string name="backup_failed">No se pudo usar ese archivo.</string>
+    <string name="backup_imported">Restaurado: %1$d fijadas, %2$d unidades, %3$d avisos, %4$d entradas.</string>
+
+    <string name="history_empty">Nada todavía. Los resultados que calcules aparecerán aquí.</string>
+    <string name="history_clear">Borrar historial</string>
+    <string name="history_reuse">Toca un resultado para reutilizarlo</string>
+
+    <plurals name="rates_offline_days">
+        <item quantity="many">Sin conexión · tasas guardadas hace %1$d días</item>
+        <item quantity="one">Sin conexión · tasas guardadas hace %1$d día</item>
+        <item quantity="other">Sin conexión · tasas guardadas hace %1$d días</item>
+    </plurals>
+    <plurals name="widget_days_ago">
+        <item quantity="many">%1$d días de antigüedad</item>
+        <item quantity="one">%1$d día de antigüedad</item>
+        <item quantity="other">%1$d días de antigüedad</item>
+    </plurals>
+</resources>
