@@ -25,3 +25,6 @@ keystore.properties
 # rebuilt from the source beside it.
 /*.apk
 /*.aab
+
+# Local agent/editor state, not part of the project.
+.claude/
