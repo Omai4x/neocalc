@@ -321,3 +321,186 @@ fun Color.darken(amount: Float): Color = Color(
     blue = blue * (1f - amount),
     alpha = alpha,
 )
+
+// ------------------------------------------------------------------ Invaders
+
+/**
+ * The three invader ranks from the 1978 cabinet, as their actual bitmaps.
+ *
+ * Each row of a string is one pixel row; '1' is lit. Drawing the real grids
+ * rather than an approximation is the difference between "a space invader" and
+ * "some blocks": the silhouettes are the thing people recognise.
+ */
+private val SQUID = listOf(
+    listOf(
+        "....11....",
+        "...1111...",
+        "..111111..",
+        ".11.11.11.",
+        "1111111111",
+        "..1.11.1..",
+        ".1......1.",
+        "..1....1..",
+    ),
+    listOf(
+        "....11....",
+        "...1111...",
+        "..111111..",
+        ".11.11.11.",
+        "1111111111",
+        ".1.1111.1.",
+        "1........1",
+        ".11....11.",
+    ),
+)
+
+private val CRAB = listOf(
+    listOf(
+        "..1.....1..",
+        "...1...1...",
+        "..1111111..",
+        ".11.111.11.",
+        "11111111111",
+        "1.1111111.1",
+        "1.1.....1.1",
+        "...11.11...",
+    ),
+    listOf(
+        "..1.....1..",
+        "1..1...1..1",
+        "1.1111111.1",
+        "111.111.111",
+        "11111111111",
+        ".111111111.",
+        "..1.....1..",
+        ".1.......1.",
+    ),
+)
+
+private val OCTOPUS = listOf(
+    listOf(
+        "...1111...",
+        ".11111111.",
+        "1111111111",
+        "111..111..",  
+        "1111111111",
+        "..111111..",
+        ".11....11.",
+        "11........",
+    ),
+    listOf(
+        "...1111...",
+        ".11111111.",
+        "1111111111",
+        "111..111..",
+        "1111111111",
+        "...1111...",
+        "..11..11..",
+        ".11....11.",
+    ),
+)
+
+/** Draws one invader from its bitmap. [rank] 0 squid, 1 crab, 2 octopus. */
+fun DrawScope.drawInvaderSprite(topLeft: Offset, size: Float, rank: Int, frame: Int) {
+    val frames = when (rank) {
+        0 -> SQUID
+        1 -> CRAB
+        else -> OCTOPUS
+    }
+    val grid = frames[frame % frames.size]
+    val columns = grid.maxOf { it.length }
+    val pixel = size / columns
+    grid.forEachIndexed { row, line ->
+        line.forEachIndexed { column, c ->
+            if (c != '1') return@forEachIndexed
+            drawRect(
+                color = Color(0xFF00FF00),
+                topLeft = Offset(topLeft.x + column * pixel, topLeft.y + row * pixel),
+                size = Size(pixel + 0.5f, pixel + 0.5f),
+            )
+        }
+    }
+}
+
+/** The player cannon: a base with a stubby barrel, in phosphor green. */
+fun DrawScope.drawCannon(centreX: Float, baseY: Float, width: Float) {
+    val green = Color(0xFF00FF00)
+    val h = width * 0.42f
+    drawRect(green, Offset(centreX - width / 2, baseY - h * 0.45f), Size(width, h * 0.45f))
+    drawRect(green, Offset(centreX - width * 0.28f, baseY - h * 0.75f), Size(width * 0.56f, h * 0.3f))
+    drawRect(green, Offset(centreX - width * 0.06f, baseY - h), Size(width * 0.12f, h * 0.3f))
+}
+
+/**
+ * A bunker that erodes. [damage] eats pixels out of the block from the top
+ * down, which is what the originals did as they absorbed fire.
+ */
+fun DrawScope.drawBunker(topLeft: Offset, size: Size, damage: Int) {
+    val green = Color(0xFF00FF00)
+    val columns = 12
+    val rows = 6
+    val px = size.width / columns
+    val py = size.height / rows
+    for (row in 0 until rows) {
+        for (column in 0 until columns) {
+            // The arch cut out of the bottom middle.
+            val arch = row >= rows - 2 && column in 4..7
+            if (arch) continue
+            // Corners are chamfered, as in the original silhouette.
+            if (row == 0 && (column < 2 || column > columns - 3)) continue
+            // Erosion is deterministic per cell, so it does not shimmer.
+            val wear = ((column * 7 + row * 13) % 11)
+            if (wear < damage * 2) continue
+            drawRect(
+                color = green,
+                topLeft = Offset(topLeft.x + column * px, topLeft.y + row * py),
+                size = Size(px + 0.5f, py + 0.5f),
+            )
+        }
+    }
+}
+
+/**
+ * The Asteroids ship: an outline triangle with a notched tail, drawn as lines
+ * on a vector monitor would draw it. No fill, because the original had none.
+ */
+fun DrawScope.drawVectorShip(
+    center: Offset,
+    radius: Float,
+    headingDegrees: Float,
+    thrusting: Boolean,
+    strokeWidth: Float,
+) {
+    rotate(degrees = headingDegrees, pivot = center) {
+        val hull = Path().apply {
+            moveTo(center.x + radius, center.y)
+            lineTo(center.x - radius * 0.75f, center.y - radius * 0.7f)
+            lineTo(center.x - radius * 0.4f, center.y)
+            lineTo(center.x - radius * 0.75f, center.y + radius * 0.7f)
+            close()
+        }
+        drawPath(hull, Color.White, style = Stroke(width = strokeWidth))
+        if (thrusting) {
+            // The exhaust flickers, as it did when the beam retraced it.
+            val flame = Path().apply {
+                moveTo(center.x - radius * 0.45f, center.y - radius * 0.28f)
+                lineTo(center.x - radius * 1.1f, center.y)
+                lineTo(center.x - radius * 0.45f, center.y + radius * 0.28f)
+            }
+            drawPath(flame, Color.White, style = Stroke(width = strokeWidth))
+        }
+    }
+}
+
+/** A tetromino cell: flat face, light top-left bevel, dark bottom-right. */
+fun DrawScope.drawTetromino(topLeft: Offset, size: Float, color: Color) {
+    val inset = size * 0.06f
+    val s = size - inset * 2
+    val o = Offset(topLeft.x + inset, topLeft.y + inset)
+    drawRect(color, o, Size(s, s))
+    val edge = s * 0.16f
+    drawRect(color.lighten(0.4f), o, Size(s, edge))
+    drawRect(color.lighten(0.4f), o, Size(edge, s))
+    drawRect(color.darken(0.35f), Offset(o.x, o.y + s - edge), Size(s, edge))
+    drawRect(color.darken(0.35f), Offset(o.x + s - edge, o.y), Size(edge, s))
+}

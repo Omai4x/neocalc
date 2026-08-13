@@ -30,6 +30,12 @@ import kotlin.random.Random
 
 // ------------------------------------------------------------------ Brick Breaker
 
+/** The six rows of the arcade cabinet, top to bottom. */
+private val BREAKOUT_ROWS = listOf(
+    Color(0xFFCB4E4E), Color(0xFFCB8E4E), Color(0xFFCBCB4E),
+    Color(0xFF4ECB4E), Color(0xFF4E4ECB), Color(0xFF9E4ECB),
+)
+
 private const val BREAKOUT_ASPECT = 0.78f
 private const val BREAKOUT_H = 1f / BREAKOUT_ASPECT
 
@@ -151,6 +157,7 @@ data class BreakoutWorld(
 @Composable
 fun BreakoutScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(BreakoutWorld.new()) }
     var paused by remember { mutableStateOf(false) }
@@ -158,7 +165,9 @@ fun BreakoutScreen(onExit: () -> Unit) {
     val countdown = rememberCountdown(round)
 
     FrameLoop(running = !world.over && !paused && countdown == 0) { dt ->
-        world = world.launch().step(dt)
+        // The paddle tracks the rail directly: a paddle that has to be nudged
+        // can never keep up with a ball, which is why every cabinet used a dial.
+        world = world.copy(paddle = controls.rail.coerceIn(0.12f, 0.88f)).launch().step(dt)
     }
     LaunchedEffect(world.over) {
         if (world.over) {
@@ -177,54 +186,57 @@ fun BreakoutScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Horizontal,
+        controls = Controls.Rail,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = {
-            val step = if (it == Direction.Left) -0.09f else 0.09f
-            world = world.copy(paddle = (world.paddle + step).coerceIn(0.12f, 0.88f))
-        },
         aspect = BREAKOUT_ASPECT,
     ) { boardModifier ->
-        GameCanvas(boardModifier.dragFraction { world = world.copy(paddle = it.coerceIn(0.12f, 0.88f)) }) {
+        GameCanvas(boardModifier.boardRail(controls)) {
             val unit = size.width
+
+            // Atari Breakout: black field, flat colour rows, square everything.
+            drawRect(Color.Black, size = size)
 
             world.bricks.forEach { brick ->
                 val (topLeft, boxSize) = world.brickRect(brick)
-                val color = Arcade.series[brick.row % Arcade.series.size]
-                drawBevelBlock(
+                drawRect(
+                    color = BREAKOUT_ROWS[brick.row % BREAKOUT_ROWS.size],
                     topLeft = Offset(topLeft.x * unit + 2f, topLeft.y * unit + 2f),
                     size = Size(boxSize.width * unit - 4f, boxSize.height * unit - 4f),
-                    color = if (brick.strength > 1) color.darken(0.25f) else color,
-                    radius = unit * 0.012f,
                 )
                 if (brick.strength > 1) {
-                    // A crack line marks the bricks that need a second hit.
-                    drawLine(
-                        color = Color.White.copy(alpha = 0.5f),
-                        start = Offset((topLeft.x + boxSize.width * 0.3f) * unit, (topLeft.y + boxSize.height * 0.3f) * unit),
-                        end = Offset((topLeft.x + boxSize.width * 0.7f) * unit, (topLeft.y + boxSize.height * 0.7f) * unit),
-                        strokeWidth = 2f,
+                    drawRect(
+                        color = Color.Black.copy(alpha = 0.35f),
+                        topLeft = Offset(topLeft.x * unit + 2f, topLeft.y * unit + 2f),
+                        size = Size(boxSize.width * unit - 4f, boxSize.height * unit - 4f),
                     )
                 }
             }
 
-            drawBevelBlock(
+            // The side walls the original drew down the edges of the field.
+            drawRect(Color(0xFF808080), Offset.Zero, Size(unit * 0.02f, size.height))
+            drawRect(Color(0xFF808080), Offset(size.width - unit * 0.02f, 0f),
+                Size(unit * 0.02f, size.height))
+
+            drawRect(
+                color = Color(0xFF0088FF),
                 topLeft = Offset(
                     (world.paddle - BreakoutWorld.PADDLE_W / 2) * unit,
                     (BREAKOUT_H - 0.075f) * unit,
                 ),
-                size = Size(BreakoutWorld.PADDLE_W * unit, 0.028f * unit),
-                color = Arcade.Sky,
+                size = Size(BreakoutWorld.PADDLE_W * unit, 0.026f * unit),
             )
 
-            drawGlossyBall(
-                center = Offset(world.ballX * unit, world.ballY * unit),
-                radius = BreakoutWorld.BALL_R * unit,
-                color = Arcade.Cloud,
+            // A square ball, as the hardware drew it.
+            val r = BreakoutWorld.BALL_R * unit
+            drawRect(
+                color = Color.White,
+                topLeft = Offset(world.ballX * unit - r, world.ballY * unit - r),
+                size = Size(r * 2, r * 2),
             )
         }
     }
@@ -316,6 +328,7 @@ data class PongWorld(
 @Composable
 fun PongScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(PongWorld()) }
@@ -324,7 +337,7 @@ fun PongScreen(onExit: () -> Unit) {
     val countdown = rememberCountdown(round)
 
     FrameLoop(running = !world.finished && !paused && countdown == 0) { dt ->
-        world = world.step(dt, random)
+        world = world.copy(player = controls.rail.coerceIn(0.13f, 0.87f)).step(dt, random)
     }
     LaunchedEffect(world.finished) {
         if (world.finished && world.playerScore > world.aiScore) {
@@ -348,47 +361,51 @@ fun PongScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Horizontal,
+        controls = Controls.Rail,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = {
-            val step = if (it == Direction.Left) -0.1f else 0.1f
-            world = world.copy(player = (world.player + step).coerceIn(0.13f, 0.87f))
-        },
         aspect = PONG_ASPECT,
     ) { boardModifier ->
-        GameCanvas(boardModifier.dragFraction { world = world.copy(player = it.coerceIn(0.13f, 0.87f)) }) {
+        GameCanvas(boardModifier.boardRail(controls)) {
             val unit = size.width
 
-            // Centre line, drawn as dashes the old-fashioned way.
-            var y = 0f
+            // 1972 Pong: black field, white shapes, nothing else at all.
+            drawRect(Color.Black, size = size)
+
+            // The net is a dashed line of solid blocks, not a hairline.
+            var y = size.height * 0.02f
             while (y < size.height) {
                 drawRect(
-                    color = Color.White.copy(alpha = 0.16f),
-                    topLeft = Offset(size.width / 2 - 2f, y),
-                    size = Size(4f, 14f),
+                    color = Color.White,
+                    topLeft = Offset(size.width / 2 - unit * 0.008f, y),
+                    size = Size(unit * 0.016f, size.height * 0.028f),
                 )
-                y += 26f
+                y += size.height * 0.052f
             }
 
-            drawBevelBlock(
+            // The score, drawn large at the top as the cabinet did.
+            drawLabel("${world.aiScore}", Offset(size.width * 0.3f, size.height * 0.07f),
+                Color.White, unit * 0.13f)
+            drawLabel("${world.playerScore}", Offset(size.width * 0.7f, size.height * 0.07f),
+                Color.White, unit * 0.13f)
+
+            drawRect(
+                color = Color.White,
                 topLeft = Offset((world.ai - PongWorld.PADDLE_W / 2) * unit, 0.05f * unit),
-                size = Size(PongWorld.PADDLE_W * unit, 0.026f * unit),
-                color = Arcade.Coral,
+                size = Size(PongWorld.PADDLE_W * unit, 0.022f * unit),
             )
-            drawBevelBlock(
-                topLeft = Offset((world.player - PongWorld.PADDLE_W / 2) * unit, (PONG_H - 0.076f) * unit),
-                size = Size(PongWorld.PADDLE_W * unit, 0.026f * unit),
-                color = Arcade.Sky,
+            drawRect(
+                color = Color.White,
+                topLeft = Offset((world.player - PongWorld.PADDLE_W / 2) * unit, (PONG_H - 0.072f) * unit),
+                size = Size(PongWorld.PADDLE_W * unit, 0.022f * unit),
             )
-            drawGlossyBall(
-                center = Offset(world.ballX * unit, world.ballY * unit),
-                radius = 0.019f * unit,
-                color = Arcade.Cloud,
-            )
+            // A square ball: Pong never had a round one.
+            val r = 0.018f * unit
+            drawRect(Color.White, Offset(world.ballX * unit - r, world.ballY * unit - r), Size(r * 2, r * 2))
         }
     }
 }
@@ -550,6 +567,7 @@ data class InvadersWorld(
 @Composable
 fun InvadersScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(InvadersWorld.new()) }
@@ -558,7 +576,7 @@ fun InvadersScreen(onExit: () -> Unit) {
     val countdown = rememberCountdown(round)
 
     FrameLoop(running = !world.over && !paused && countdown == 0) { dt ->
-        world = world.step(dt, random)
+        world = world.copy(ship = controls.rail.coerceIn(0.06f, 0.94f)).step(dt, random)
     }
     LaunchedEffect(world.over) {
         if (world.over) {
@@ -577,64 +595,71 @@ fun InvadersScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.HorizontalAction,
+        controls = Controls.RailFire,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = {
-            val step = if (it == Direction.Left) -0.075f else 0.075f
-            world = world.copy(ship = (world.ship + step).coerceIn(0.06f, 0.94f))
-        },
         onAction = { world = world.fire() },
         aspect = INVADERS_ASPECT,
     ) { boardModifier ->
-        GameCanvas(
-            boardModifier
-                .dragFraction { world = world.copy(ship = it.coerceIn(0.06f, 0.94f)) }
-                .tapAnywhere { world = world.fire() },
-        ) {
+        GameCanvas(boardModifier.boardRail(controls).tapAnywhere { world = world.fire() }) {
             val unit = size.width
-            drawStarField(42, seed = 3)
+
+            // Space Invaders was a black screen with green phosphor shapes.
+            drawRect(Color.Black, size = size)
 
             world.invaders.filter { it.alive }.forEach { invader ->
                 val position = world.invaderPos(invader)
-                drawInvader(
+                drawInvaderSprite(
                     topLeft = Offset(position.x * unit, position.y * unit),
                     size = 0.07f * unit,
-                    color = Arcade.series[invader.row % Arcade.series.size],
-                    frame = world.frame / 20,
+                    // Three ranks of creature, as in the cabinet: squid at the
+                    // top, crab in the middle, octopus at the bottom.
+                    rank = invader.row.coerceIn(0, 2),
+                    frame = world.frame / 18,
                 )
             }
 
             world.bunkers.forEachIndexed { index, (_, strength) ->
                 if (strength <= 0) return@forEachIndexed
-                drawBevelBlock(
+                drawBunker(
                     topLeft = Offset(
                         (world.bunkerX(index) - 0.08f) * unit,
-                        (InvadersWorld.SHIP_Y - 0.12f) * unit,
+                        (InvadersWorld.SHIP_Y - 0.13f) * unit,
                     ),
-                    size = Size(0.16f * unit, 0.045f * unit),
-                    color = Arcade.Green.copy(alpha = 0.35f + strength * 0.1f),
+                    size = Size(0.16f * unit, 0.06f * unit),
+                    damage = 6 - strength,
                 )
             }
 
             world.shots.forEach { shot ->
-                drawRoundRect(
-                    color = if (shot.mine) Arcade.Cloud else Arcade.Red,
-                    topLeft = Offset(shot.x * unit - 2f, shot.y * unit - 10f),
-                    size = Size(4f, 18f),
-                    cornerRadius = CornerRadius(2f),
-                )
+                if (shot.mine) {
+                    drawRect(Color.White, Offset(shot.x * unit - 1.5f, shot.y * unit - 10f), Size(3f, 20f))
+                } else {
+                    // Enemy fire is a zigzag bolt, not a straight line.
+                    val step = 5f
+                    var y = shot.y * unit - 12f
+                    var flip = 1f
+                    while (y < shot.y * unit + 12f) {
+                        drawRect(Color.White, Offset(shot.x * unit + flip * 2f - 1.5f, y), Size(3f, step))
+                        y += step
+                        flip = -flip
+                    }
+                }
             }
 
-            drawShip(
-                center = Offset(world.ship * unit, InvadersWorld.SHIP_Y * unit),
-                radius = 0.045f * unit,
-                headingDegrees = -90f,
-                color = Arcade.Sky,
+            drawCannon(
+                centreX = world.ship * unit,
+                baseY = InvadersWorld.SHIP_Y * unit + 0.03f * unit,
+                width = 0.1f * unit,
             )
+
+            // The ground line the cannon sits on.
+            drawRect(Color(0xFF00FF00), Offset(0f, (InvadersWorld.SHIP_Y + 0.045f) * unit),
+                Size(size.width, unit * 0.006f))
         }
     }
 }
@@ -792,6 +817,7 @@ data class AsteroidsWorld(
 @Composable
 fun AsteroidsScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(AsteroidsWorld.new(random)) }
@@ -800,9 +826,15 @@ fun AsteroidsScreen(onExit: () -> Unit) {
     val countdown = rememberCountdown(round)
 
     FrameLoop(running = !world.over && !paused && countdown == 0) { dt ->
-        world = world.step(dt, random)
-        // Thrust is a tap, so it decays rather than sticking on.
-        if (world.thrusting) world = world.copy(thrusting = false)
+        // Held controls: the ship turns for as long as the button is down and
+        // thrusts while thrust is held, which is how the cabinet worked. Tapping
+        // to rotate by a fixed step made it impossible to aim.
+        world = world
+            .copy(
+                heading = world.heading + controls.turning * 190f * dt,
+                thrusting = controls.thrusting,
+            )
+            .step(dt, random)
     }
     LaunchedEffect(world.over) {
         if (world.over) {
@@ -821,62 +853,59 @@ fun AsteroidsScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Ship,
+        controls = Controls.Ship,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = {
-            world = when (it) {
-                Direction.Left -> world.copy(heading = world.heading - 22f)
-                Direction.Right -> world.copy(heading = world.heading + 22f)
-                else -> world.copy(thrusting = true)
-            }
-        },
         onAction = { world = world.fire() },
         aspect = ROCK_ASPECT,
     ) { boardModifier ->
         GameCanvas(boardModifier.tapAnywhere { world = world.fire() }) {
             val unit = size.width
-            drawStarField(60, seed = 11)
+
+            // Asteroids ran on a vector monitor: black void, white outlines,
+            // nothing filled. Drawing it any other way loses the whole look.
+            drawRect(Color.Black, size = size)
+            val stroke = Stroke(width = unit * 0.006f)
 
             world.rocks.forEach { rock ->
                 val centre = Offset(rock.x * unit, rock.y * unit)
                 val radius = world.radiusOf(rock) * unit
-                // Rocks are irregular polygons, not circles - a circle reads as
-                // a ball, and this is meant to be stone.
                 val path = androidx.compose.ui.graphics.Path()
-                val points = 9
+                val points = 10
                 repeat(points) { index ->
                     val angle = index * 360f / points + rock.spin
-                    val wobble = 0.78f + ((index * 37) % 10) / 24f
+                    // A fixed jag per vertex, so a rock keeps its shape as it
+                    // tumbles instead of boiling.
+                    val wobble = 0.74f + ((index * 37 + rock.size * 11) % 10) / 26f
                     val point = pointOnCircle(centre, radius * wobble, angle)
                     if (index == 0) path.moveTo(point.x, point.y) else path.lineTo(point.x, point.y)
                 }
                 path.close()
-                drawPath(path, Arcade.Slate)
-                drawPath(path, Color.White.copy(alpha = 0.25f), style = Stroke(width = 2f))
+                drawPath(path, Color.White, style = stroke)
             }
 
             world.bullets.forEach {
-                drawCircle(Arcade.Amber, 3.5f, Offset(it.x * unit, it.y * unit))
+                drawRect(Color.White, Offset(it.x * unit - 2f, it.y * unit - 2f), Size(4f, 4f))
             }
 
-            if (world.shield > 0f) {
+            if (world.shield > 0f && (world.shield * 8).toInt() % 2 == 0) {
                 drawCircle(
-                    color = Arcade.Sky.copy(alpha = 0.35f),
+                    color = Color.White,
                     radius = 0.055f * unit,
                     center = Offset(world.x * unit, world.y * unit),
-                    style = Stroke(width = 3f),
+                    style = Stroke(width = unit * 0.004f),
                 )
             }
-            drawShip(
+            drawVectorShip(
                 center = Offset(world.x * unit, world.y * unit),
-                radius = 0.038f * unit,
+                radius = 0.042f * unit,
                 headingDegrees = world.heading,
-                color = Arcade.Cloud,
                 thrusting = world.thrusting,
+                strokeWidth = unit * 0.006f,
             )
         }
     }
@@ -959,6 +988,7 @@ data class TronState(
 @Composable
 fun TronScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var state by remember(round) { mutableStateOf(TronState.new()) }
@@ -966,10 +996,18 @@ fun TronScreen(onExit: () -> Unit) {
     var best by remember { mutableIntStateOf(ArcadeScores.best(context, "tron")) }
     val countdown = rememberCountdown(round)
 
-    TickLoop(
-        running = state.outcome == ChompOutcome.Playing && !paused && countdown == 0,
-        intervalMs = { 115L },
-    ) { state = state.step(random) }
+    var previous by remember(round) { mutableStateOf(state) }
+    var ticks by remember(round) { mutableIntStateOf(0) }
+    val running = state.outcome == ChompOutcome.Playing && !paused && countdown == 0
+
+    TickLoop(running = running, intervalMs = { 105L }) {
+        controls.direction?.let { state = state.turn(it) }
+        previous = state
+        ticks++
+        state = state.step(random)
+    }
+
+    val progress = rememberTickProgress(ticks, 105L, running)
 
     LaunchedEffect(state.outcome) {
         if (state.outcome != ChompOutcome.Playing) {
@@ -987,33 +1025,56 @@ fun TronScreen(onExit: () -> Unit) {
             ChompOutcome.Lost -> GameStatus.Over("You crashed", "Score ${state.score}.")
             else -> if (paused) GameStatus.Paused else null
         },
-        pad = Pad.Directional,
+        controls = Controls.Joystick,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = { state = state.turn(it) },
     ) { boardModifier ->
-        GameCanvas(boardModifier.swipeDirections { state = state.turn(it) }) {
+        GameCanvas(boardModifier.boardStick(controls) { state = state.turn(it) }) {
             val cell = size.width / TronState.GRID
-            state.trails.forEach { (position, mine) ->
-                drawRect(
-                    color = (if (mine) Arcade.Teal else Arcade.Pink).copy(alpha = 0.55f),
-                    topLeft = Offset(position.x * cell, position.y * cell),
-                    size = Size(cell, cell),
-                )
+
+            // The film's grid: black field, cyan and magenta light walls.
+            drawRect(Color(0xFF04060A), size = size)
+            for (i in 0..TronState.GRID) {
+                val line = Color(0xFF12303A)
+                drawLine(line, Offset(i * cell, 0f), Offset(i * cell, size.height), 1f)
+                drawLine(line, Offset(0f, i * cell), Offset(size.width, i * cell), 1f)
             }
-            listOf(state.player to Arcade.Teal, state.rival to Arcade.Pink).forEach { (cellPos, color) ->
+
+            val cyan = Color(0xFF00E5FF)
+            val magenta = Color(0xFFFF2D95)
+            state.trails.forEach { (position, mine) ->
+                val color = if (mine) cyan else magenta
+                // A soft halo under each block is what makes a wall look lit
+                // rather than painted.
+                drawRect(
+                    color = color.copy(alpha = 0.22f),
+                    topLeft = Offset(position.x * cell - cell * 0.25f, position.y * cell - cell * 0.25f),
+                    size = Size(cell * 1.5f, cell * 1.5f),
+                )
                 drawRect(
                     color = color,
-                    topLeft = Offset(cellPos.x * cell, cellPos.y * cell),
-                    size = Size(cell, cell),
+                    topLeft = Offset(position.x * cell + cell * 0.16f, position.y * cell + cell * 0.16f),
+                    size = Size(cell * 0.68f, cell * 0.68f),
+                )
+            }
+            listOf(
+                Triple(previous.player, state.player, cyan),
+                Triple(previous.rival, state.rival, magenta),
+            ).forEach { (was, now, color) ->
+                val (bx, by) = lerpCell(was, now, progress.value)
+                drawRect(
+                    color = Color.White,
+                    topLeft = Offset(bx * cell + cell * 0.1f, by * cell + cell * 0.1f),
+                    size = Size(cell * 0.8f, cell * 0.8f),
                 )
                 drawRect(
-                    color = Color.White.copy(alpha = 0.7f),
-                    topLeft = Offset(cellPos.x * cell + cell * 0.3f, cellPos.y * cell + cell * 0.3f),
-                    size = Size(cell * 0.4f, cell * 0.4f),
+                    color = color,
+                    topLeft = Offset(bx * cell + cell * 0.26f, by * cell + cell * 0.26f),
+                    size = Size(cell * 0.48f, cell * 0.48f),
                 )
             }
         }

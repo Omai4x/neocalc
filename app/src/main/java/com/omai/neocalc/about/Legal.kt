@@ -141,6 +141,18 @@ object ReleaseNotes {
 
     val ALL: List<Release> = listOf(
         Release(
+            version = "1.4",
+            date = "13 August 2026",
+            headline = "The arcade plays like the machines it borrows from.",
+            changes = listOf(
+                "Real controls. An analogue stick you can hold and steer with, a slider for the paddle games, and buttons that repeat while held. The old pad only registered taps, which is why holding a direction did nothing.",
+                "Movement is smooth. Tile games still think in whole squares, but they are drawn between squares now, so nothing jumps.",
+                "The ghosts play properly. They leave the pen one at a time, alternate between hunting you and retreating to their corners, and each one chases a different point, which is what gives them their personalities.",
+                "Graphics redrawn from the originals: the blue maze, the real invader sprites, vector-outline asteroids, Atari's brick colours, white-on-black Pong, and light-cycle trails.",
+                "No dropped frames. Animation now invalidates only the drawing, not the whole screen.",
+            ),
+        ),
+        Release(
             version = "1.3.2",
             date = "13 August 2026",
             headline = "Nothing hides under the system bars any more.",

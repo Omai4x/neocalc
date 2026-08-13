@@ -49,29 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-/** Which control cluster a game wants under the board. */
-enum class Pad {
-    /** All four directions. Mazes, snakes, sliding puzzles. */
-    Directional,
-
-    /** Left and right only, sized to fill the width. Paddles, lanes, shooters. */
-    Horizontal,
-
-    /** One big button. Flappy-style games, jumpers, timing games. */
-    Action,
-
-    /** Left, right, and a fire button between them. */
-    HorizontalAction,
-
-    /** Rotate left/right plus thrust and fire. */
-    Ship,
-
-    /** Nothing: the board itself is the control. Board games, taps, puzzles. */
-    Board,
-}
-
-/** Labels for [Pad.Action] and the fire key, so a game can name its own verb. */
-data class PadLabels(val action: String = "TAP", val fire: String = "FIRE")
 
 /**
  * Chrome shared by every game: the top bar with the close button always in the
@@ -86,7 +63,8 @@ fun GameShell(
     score: Int,
     best: Int,
     status: GameStatus?,
-    pad: Pad,
+    controls: Controls,
+    state: ControlState,
     onExit: () -> Unit,
     onRestart: () -> Unit,
     modifier: Modifier = Modifier,
@@ -94,12 +72,11 @@ fun GameShell(
     countdown: Int = 0,
     paused: Boolean = false,
     onPause: (() -> Unit)? = null,
-    onDirection: (Direction) -> Unit = {},
+    onStep: (Direction) -> Unit = {},
     onAction: () -> Unit = {},
-    onSecondary: () -> Unit = {},
     /** An extra button beside Restart, for a game-specific verb like Undo. */
     extraAction: Pair<String, () -> Unit>? = null,
-    labels: PadLabels = PadLabels(),
+    labels: ControlLabels = ControlLabels(),
     aspect: Float = 1f,
     board: @Composable (Modifier) -> Unit,
 ) {
@@ -151,11 +128,11 @@ fun GameShell(
         Spacer(Modifier.height(12.dp))
 
         ControlDeck(
-            pad = pad,
+            controls = controls,
+            state = state,
             labels = labels,
-            onDirection = onDirection,
+            onStep = onStep,
             onAction = onAction,
-            onSecondary = onSecondary,
         )
 
         Row(
@@ -332,133 +309,6 @@ private fun StatusOverlay(status: GameStatus, onRestart: () -> Unit) {
                     )
                 }
             }
-        }
-    }
-}
-
-// ------------------------------------------------------------------ Controls
-
-/** Big by design: these are thumb targets on a phone held one-handed. */
-private val PAD_KEY = 74.dp
-private val PAD_TALL = 66.dp
-
-@Composable
-private fun ControlDeck(
-    pad: Pad,
-    labels: PadLabels,
-    onDirection: (Direction) -> Unit,
-    onAction: () -> Unit,
-    onSecondary: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        when (pad) {
-            Pad.Directional -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                PadKey("▲", "Up", Modifier.size(PAD_KEY)) { onDirection(Direction.Up) }
-                Row(horizontalArrangement = Arrangement.spacedBy(PAD_KEY)) {
-                    PadKey("◀", "Left", Modifier.size(PAD_KEY)) { onDirection(Direction.Left) }
-                    PadKey("▶", "Right", Modifier.size(PAD_KEY)) { onDirection(Direction.Right) }
-                }
-                PadKey("▼", "Down", Modifier.size(PAD_KEY)) { onDirection(Direction.Down) }
-            }
-
-            Pad.Horizontal -> Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                PadKey("◀", "Left", Modifier.weight(1f).height(PAD_TALL)) {
-                    onDirection(Direction.Left)
-                }
-                PadKey("▶", "Right", Modifier.weight(1f).height(PAD_TALL)) {
-                    onDirection(Direction.Right)
-                }
-            }
-
-            Pad.HorizontalAction -> Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                PadKey("◀", "Left", Modifier.weight(1f).height(PAD_TALL)) {
-                    onDirection(Direction.Left)
-                }
-                PadKey(labels.fire, labels.fire, Modifier.weight(1.2f).height(PAD_TALL), accent = true) {
-                    onAction()
-                }
-                PadKey("▶", "Right", Modifier.weight(1f).height(PAD_TALL)) {
-                    onDirection(Direction.Right)
-                }
-            }
-
-            Pad.Action -> PadKey(
-                labels.action,
-                labels.action,
-                Modifier.fillMaxWidth().height(PAD_TALL),
-                accent = true,
-            ) { onAction() }
-
-            Pad.Ship -> Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                PadKey("↺", "Turn left", Modifier.weight(1f).height(PAD_TALL)) {
-                    onDirection(Direction.Left)
-                }
-                PadKey("↻", "Turn right", Modifier.weight(1f).height(PAD_TALL)) {
-                    onDirection(Direction.Right)
-                }
-                PadKey("▲", "Thrust", Modifier.weight(1f).height(PAD_TALL)) {
-                    onDirection(Direction.Up)
-                }
-                PadKey(labels.fire, labels.fire, Modifier.weight(1.1f).height(PAD_TALL), accent = true) {
-                    onAction()
-                }
-            }
-
-            Pad.Board -> Text(
-                text = "Play on the board",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(vertical = 12.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PadKey(
-    glyph: String,
-    description: String,
-    modifier: Modifier = Modifier,
-    accent: Boolean = false,
-    onClick: () -> Unit,
-) {
-    val scheme = MaterialTheme.colorScheme
-    val haptics = LocalHapticFeedback.current
-    Surface(
-        onClick = {
-            // A control you can feel is one you can use without looking at it,
-            // which is exactly the situation on a game board.
-            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            onClick()
-        },
-        shape = RoundedCornerShape(18.dp),
-        color = if (accent) scheme.primary else scheme.surfaceVariant,
-        contentColor = if (accent) scheme.onPrimary else scheme.primary,
-        border = if (accent) null else BorderStroke(1.dp, scheme.outline),
-        modifier = modifier
-            .padding(3.dp)
-            .semantics { contentDescription = description },
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = glyph,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
         }
     }
 }

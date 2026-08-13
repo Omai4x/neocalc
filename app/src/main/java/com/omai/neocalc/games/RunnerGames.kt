@@ -175,6 +175,7 @@ data class TetrisState(
 @Composable
 fun TetrisScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var state by remember(round) { mutableStateOf(TetrisState.new(random)) }
@@ -182,10 +183,20 @@ fun TetrisScreen(onExit: () -> Unit) {
     var best by remember { mutableIntStateOf(ArcadeScores.best(context, "blocks")) }
     val countdown = rememberCountdown(round)
 
-    TickLoop(
-        running = !state.over && !paused && countdown == 0,
-        intervalMs = { state.intervalMs },
-    ) { state = state.drop(random) }
+    var ticks by remember(round) { mutableIntStateOf(0) }
+    var landedAt by remember(round) { mutableIntStateOf(-1) }
+    val running = !state.over && !paused && countdown == 0
+
+    TickLoop(running = running, intervalMs = { state.intervalMs }) {
+        val before = state.position
+        state = state.drop(random)
+        // Only a piece that actually fell is animated; one that just landed
+        // must not slide into the well it has already become part of.
+        landedAt = if (state.position == before.copy(y = before.y + 1)) -1 else ticks
+        ticks++
+    }
+
+    val fall = rememberTickProgress(ticks, state.intervalMs, running)
 
     LaunchedEffect(state.over) {
         if (state.over) {
@@ -204,13 +215,16 @@ fun TetrisScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Directional,
+        controls = Controls.Steps,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = {
+        onStep = {
+            // Left, right and soft drop repeat while held; rotate does not,
+            // because a spinning piece is never what anyone wants.
             state = when (it) {
                 Direction.Left -> state.move(-1)
                 Direction.Right -> state.move(1)
@@ -230,11 +244,20 @@ fun TetrisScreen(onExit: () -> Unit) {
         }) {
             val cell = size.width / TetrisState.WIDTH
 
+            // A dark well with a faint lattice, as on the Game Boy screen.
+            drawRect(Color(0xFF0B0D0F), size = size)
             for (column in 0..TetrisState.WIDTH) {
                 drawLine(
-                    Color.White.copy(alpha = 0.04f),
+                    Color.White.copy(alpha = 0.05f),
                     Offset(column * cell, 0f),
                     Offset(column * cell, size.height),
+                )
+            }
+            for (row in 0..TetrisState.HEIGHT) {
+                drawLine(
+                    Color.White.copy(alpha = 0.05f),
+                    Offset(0f, row * cell),
+                    Offset(size.width, row * cell),
                 )
             }
 
@@ -257,17 +280,23 @@ fun TetrisScreen(onExit: () -> Unit) {
             }
 
             state.well.forEach { (position, color) ->
-                drawBevelBlock(
-                    Offset(position.x * cell + 1.5f, position.y * cell + 1.5f),
-                    Size(cell - 3f, cell - 3f),
-                    color,
-                )
+                drawTetromino(Offset(position.x * cell, position.y * cell), cell, color)
             }
+            val slide = if (landedAt == ticks - 1) 0f else (fall.value - 1f) * cell
             state.blocks().forEach {
-                drawBevelBlock(
-                    Offset(it.x * cell + 1.5f, it.y * cell + 1.5f),
-                    Size(cell - 3f, cell - 3f),
-                    state.piece.color,
+                drawTetromino(Offset(it.x * cell, it.y * cell + slide), cell, state.piece.color)
+            }
+
+            // The next piece, tucked into the top-right of the well.
+            val previewCell = cell * 0.62f
+            state.next.cells[0].forEach { c ->
+                drawTetromino(
+                    Offset(
+                        size.width - previewCell * 4.4f + c.x * previewCell,
+                        previewCell * 0.5f + c.y * previewCell,
+                    ),
+                    previewCell,
+                    state.next.color.copy(alpha = 0.75f),
                 )
             }
         }
@@ -275,6 +304,14 @@ fun TetrisScreen(onExit: () -> Unit) {
 }
 
 // ------------------------------------------------------------------ Road Hop
+
+/** The saturated primaries the cabinet used for traffic. */
+private val FROGGER_TRAFFIC = listOf(
+    androidx.compose.ui.graphics.Color(0xFFFFFF00),
+    androidx.compose.ui.graphics.Color(0xFFFF00FF),
+    androidx.compose.ui.graphics.Color(0xFF00FFFF),
+    androidx.compose.ui.graphics.Color(0xFFFF8000),
+)
 
 data class TrafficLane(val row: Int, val offset: Float, val speed: Float, val gaps: Set<Int>)
 
@@ -351,6 +388,7 @@ data class HopState(
 @Composable
 fun FroggerScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var state by remember(round) { mutableStateOf(HopState.new(random)) }
@@ -378,51 +416,66 @@ fun FroggerScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Directional,
+        controls = Controls.Joystick,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = { state = state.hop(it, random) },
+        onStep = { state = state.hop(it, random) },
         aspect = HopState.WIDTH.toFloat() / HopState.HEIGHT,
     ) { boardModifier ->
         GameCanvas(boardModifier.swipeDirections { state = state.hop(it, random) }) {
             val cell = size.width / HopState.WIDTH
 
-            // Grass banks top and bottom, tarmac between - the road reads as a road.
-            drawRect(Arcade.Green.darken(0.35f), Offset.Zero, Size(size.width, cell))
-            drawRect(
-                Arcade.Green.darken(0.35f),
-                Offset(0f, (HopState.HEIGHT - 1) * cell),
-                Size(size.width, cell),
-            )
-            drawRect(
-                Color(0xFF37474F),
-                Offset(0f, cell),
-                Size(size.width, cell * (HopState.HEIGHT - 2)),
-            )
-            for (row in HopState.FIRST_ROAD..HopState.LAST_ROAD) {
+            // Frogger's board: a black road below, a blue river above, and
+            // green banks at each end.
+            val bank = Color(0xFF00A000)
+            val road = Color(0xFF000000)
+            val river = Color(0xFF0000C0)
+            val midway = HopState.FIRST_ROAD + (HopState.LAST_ROAD - HopState.FIRST_ROAD) / 2
+
+            drawRect(bank, Offset.Zero, Size(size.width, cell))
+            drawRect(river, Offset(0f, cell), Size(size.width, cell * (midway - 1)))
+            drawRect(bank, Offset(0f, midway * cell), Size(size.width, cell))
+            drawRect(road, Offset(0f, (midway + 1) * cell),
+                Size(size.width, cell * (HopState.HEIGHT - midway - 2)))
+            drawRect(bank, Offset(0f, (HopState.HEIGHT - 1) * cell), Size(size.width, cell))
+
+            // Lane markings only on the road half.
+            for (row in (midway + 1) until HopState.HEIGHT - 1) {
                 var x = 0f
                 while (x < size.width) {
-                    drawRect(
-                        Color.White.copy(alpha = 0.18f),
-                        Offset(x, row * cell - 1f),
-                        Size(cell * 0.35f, 2f),
-                    )
-                    x += cell * 0.7f
+                    drawRect(Color(0xFFFFFF00), Offset(x, row * cell - 1f), Size(cell * 0.4f, 2f))
+                    x += cell * 0.8f
                 }
             }
 
             state.lanes.forEach { lane ->
+                val onRiver = lane.row <= midway
                 for (x in 0 until HopState.WIDTH) {
                     if (!state.occupied(lane, x)) continue
-                    drawCar(
-                        topLeft = Offset(x * cell + cell * 0.08f, lane.row * cell + cell * 0.12f),
-                        size = Size(cell * 0.84f, cell * 0.76f),
-                        color = Arcade.series[(lane.row * 3 + x) % Arcade.series.size],
-                        facingUp = lane.speed > 0,
-                    )
+                    if (onRiver) {
+                        // Logs, drawn as a brown bar with grain.
+                        drawRect(
+                            Color(0xFF8B5A2B),
+                            Offset(x * cell, lane.row * cell + cell * 0.18f),
+                            Size(cell, cell * 0.64f),
+                        )
+                        drawRect(
+                            Color(0xFF6B421F),
+                            Offset(x * cell, lane.row * cell + cell * 0.42f),
+                            Size(cell, cell * 0.08f),
+                        )
+                    } else {
+                        drawCar(
+                            topLeft = Offset(x * cell + cell * 0.08f, lane.row * cell + cell * 0.14f),
+                            size = Size(cell * 0.84f, cell * 0.72f),
+                            color = FROGGER_TRAFFIC[(lane.row + x) % FROGGER_TRAFFIC.size],
+                            facingUp = lane.speed > 0,
+                        )
+                    }
                 }
             }
 
@@ -484,6 +537,7 @@ data class RacerWorld(
 @Composable
 fun RacerScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(RacerWorld()) }
@@ -492,7 +546,10 @@ fun RacerScreen(onExit: () -> Unit) {
     val countdown = rememberCountdown(round)
 
     FrameLoop(running = !world.over && !paused && countdown == 0) { dt ->
-        world = world.step(dt, random)
+        // The rail maps straight onto a lane, so steering is immediate rather
+        // than a queue of nudges.
+        val lane = (controls.rail * RacerWorld.LANES).toInt().coerceIn(0, RacerWorld.LANES - 1)
+        world = world.copy(lane = lane).step(dt, random)
     }
     LaunchedEffect(world.over) {
         if (world.over) {
@@ -510,26 +567,24 @@ fun RacerScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Horizontal,
+        controls = Controls.Rail,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = {
-            val next = world.lane + if (it == Direction.Left) -1 else 1
-            world = world.copy(lane = next.coerceIn(0, RacerWorld.LANES - 1))
-        },
         aspect = RacerWorld.ASPECT,
     ) { boardModifier ->
-        GameCanvas(boardModifier.swipeDirections {
-            val next = world.lane + if (it == Direction.Left) -1 else 1
-            world = world.copy(lane = next.coerceIn(0, RacerWorld.LANES - 1))
-        }) {
+        GameCanvas(boardModifier.boardRail(controls)) {
             val unit = size.width
             val laneWidth = unit / RacerWorld.LANES
 
-            drawRect(Color(0xFF2E3B44), Offset.Zero, size)
+            // Grass verges either side of the tarmac, as in every top-down racer.
+            drawRect(Color(0xFF1B5E20), Offset.Zero, size)
+            drawRect(Color(0xFF2B2B2B), Offset(unit * 0.06f, 0f), Size(unit * 0.88f, size.height))
+            drawRect(Color.White, Offset(unit * 0.06f, 0f), Size(unit * 0.012f, size.height))
+            drawRect(Color.White, Offset(unit * 0.928f, 0f), Size(unit * 0.012f, size.height))
             // Dashes scroll with the distance travelled, which is what sells speed.
             for (divider in 1 until RacerWorld.LANES) {
                 var y = -(world.distance * 8f) % 60f
@@ -629,6 +684,7 @@ data class CopterWorld(
 @Composable
 fun CopterScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(CopterWorld.new(random)) }
@@ -637,7 +693,9 @@ fun CopterScreen(onExit: () -> Unit) {
     val countdown = rememberCountdown(round)
 
     FrameLoop(running = !world.over && !paused && countdown == 0) { dt ->
-        world = world.step(dt, random)
+        // Genuinely held: the copter climbs while the button is down and falls
+        // the moment it is released, which is the whole game.
+        world = world.copy(lifting = controls.firing).step(dt, random)
     }
     LaunchedEffect(world.over) {
         if (world.over) {
@@ -655,8 +713,9 @@ fun CopterScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Action,
-        labels = PadLabels(action = "HOLD TO CLIMB"),
+        controls = Controls.Action,
+        state = controls,
+        labels = ControlLabels(action = "HOLD TO CLIMB"),
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
@@ -664,26 +723,25 @@ fun CopterScreen(onExit: () -> Unit) {
         onPause = { paused = !paused },
         // A tap gives a short burst of lift, which is far kinder on a touch
         // screen than requiring a genuine press-and-hold.
-        onAction = { world = world.copy(vy = -0.75f, lifting = true) },
         aspect = CopterWorld.ASPECT,
     ) { boardModifier ->
-        GameCanvas(boardModifier.tapAnywhere { world = world.copy(vy = -0.75f) }) {
+        GameCanvas(boardModifier.holdToRise { world = world.copy(lifting = it) }) {
             val unit = size.width
-            drawStarField(28, seed = 7)
+            drawRect(Color(0xFF0A0A0A), size = size)
 
             world.walls.forEach { (x, centre, gap) ->
                 val left = x * unit - unit * 0.05f
                 val width = unit * 0.1f
-                drawRect(
-                    Arcade.Brown,
-                    Offset(left, 0f),
-                    Size(width, (centre - gap / 2) * unit),
-                )
-                drawRect(
-                    Arcade.Brown,
-                    Offset(left, (centre + gap / 2) * unit),
-                    Size(width, size.height - (centre + gap / 2) * unit),
-                )
+                // Cave walls in the green of the old terminal game, with a lit
+                // edge where they meet the passage.
+                val rock = Color(0xFF1B5E20)
+                val edge = Color(0xFF4CAF50)
+                drawRect(rock, Offset(left, 0f), Size(width, (centre - gap / 2) * unit))
+                drawRect(edge, Offset(left, (centre - gap / 2) * unit - unit * 0.008f),
+                    Size(width, unit * 0.008f))
+                drawRect(rock, Offset(left, (centre + gap / 2) * unit),
+                    Size(width, size.height - (centre + gap / 2) * unit))
+                drawRect(edge, Offset(left, (centre + gap / 2) * unit), Size(width, unit * 0.008f))
             }
 
             val centre = Offset(CopterWorld.COPTER_X * unit, world.y * unit)
@@ -758,6 +816,7 @@ data class FlapWorld(
 @Composable
 fun FlapScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(FlapWorld.new()) }
@@ -784,8 +843,9 @@ fun FlapScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Action,
-        labels = PadLabels(action = "FLAP"),
+        controls = Controls.Action,
+        state = controls,
+        labels = ControlLabels(action = "FLAP"),
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
@@ -797,12 +857,10 @@ fun FlapScreen(onExit: () -> Unit) {
         GameCanvas(boardModifier.tapAnywhere { world = world.flap() }) {
             val unit = size.width
 
-            drawRect(
-                androidx.compose.ui.graphics.Brush.verticalGradient(
-                    listOf(Arcade.Sky.copy(alpha = 0.35f), Arcade.Cloud.copy(alpha = 0.12f)),
-                ),
-                size = size,
-            )
+            drawRect(Color(0xFF4EC0CA), size = size)
+            // A band of cloud and a ground strip, as in the original.
+            drawRect(Color(0xFFDED895), Offset(0f, size.height * 0.93f), Size(size.width, size.height * 0.07f))
+            drawRect(Color(0xFF73BF2E), Offset(0f, size.height * 0.93f), Size(size.width, size.height * 0.012f))
 
             world.pipes.forEach { (x, centre) ->
                 val left = x * unit - unit * 0.07f
@@ -811,14 +869,18 @@ fun FlapScreen(onExit: () -> Unit) {
                     0f to (centre - world.gap / 2) * unit,
                     (centre + world.gap / 2) * unit to size.height,
                 ).forEach { (top, bottom) ->
-                    drawRect(Arcade.Green, Offset(left, top), Size(width, bottom - top))
-                    // A wider lip at the mouth of each pipe.
-                    val lipY = if (top == 0f) bottom - unit * 0.03f else top
-                    drawRect(
-                        Arcade.Green.darken(0.18f),
-                        Offset(left - unit * 0.012f, lipY),
-                        Size(width + unit * 0.024f, unit * 0.03f),
-                    )
+                    val pipe = Color(0xFF73BF2E)
+                    drawRect(pipe, Offset(left, top), Size(width, bottom - top))
+                    // Highlight and shade down the barrel give it the tube look.
+                    drawRect(Color(0xFF9BE04F), Offset(left + width * 0.12f, top),
+                        Size(width * 0.18f, bottom - top))
+                    drawRect(Color(0xFF4E8A1E), Offset(left + width * 0.78f, top),
+                        Size(width * 0.22f, bottom - top))
+                    val lipY = if (top == 0f) bottom - unit * 0.035f else top
+                    drawRect(pipe, Offset(left - unit * 0.014f, lipY),
+                        Size(width + unit * 0.028f, unit * 0.035f))
+                    drawRect(Color(0xFF2E5E12), Offset(left - unit * 0.014f, lipY),
+                        Size(width + unit * 0.028f, unit * 0.005f))
                 }
             }
 
@@ -911,18 +973,18 @@ data class AscendWorld(
 @Composable
 fun AscendScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(AscendWorld.new(random)) }
-    var drift by remember(round) { mutableStateOf(0f) }
     var paused by remember { mutableStateOf(false) }
     var best by remember { mutableIntStateOf(ArcadeScores.best(context, "ascend")) }
     val countdown = rememberCountdown(round)
 
     FrameLoop(running = !world.over && !paused && countdown == 0) { dt ->
-        world = world.step(dt, drift, random)
-        // Steering decays, so a tap is a nudge rather than a permanent heading.
-        drift *= 0.94f
+        // The stick is a steering axis: how far you push is how fast you drift,
+        // which is the feel a tilt-controlled jumper has.
+        world = world.step(dt, controls.vector.x * 1.5f, random)
     }
     LaunchedEffect(world.over) {
         if (world.over) {
@@ -940,16 +1002,16 @@ fun AscendScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Horizontal,
+        controls = Controls.Joystick,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
         paused = paused,
         onPause = { paused = !paused },
-        onDirection = { drift = if (it == Direction.Left) -0.85f else 0.85f },
         aspect = AscendWorld.ASPECT,
     ) { boardModifier ->
-        GameCanvas(boardModifier.dragFraction { drift = (it - world.x) * 3.4f }) {
+        GameCanvas(boardModifier) {
             val unit = size.width
 
             world.platforms.forEach { platform ->

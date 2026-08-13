@@ -68,6 +68,7 @@ object TicTacToe {
 @Composable
 fun TicTacToeScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     var round by remember { mutableIntStateOf(0) }
     var grid by remember(round) { mutableStateOf(List(9) { 0 }) }
     var wins by remember { mutableIntStateOf(0) }
@@ -105,7 +106,8 @@ fun TicTacToeScreen(onExit: () -> Unit) {
             finished -> GameStatus.Won("Draw", "The best result available.")
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
     ) { boardModifier ->
@@ -223,6 +225,7 @@ data class ConnectFour(
 @Composable
 fun ConnectFourScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var board by remember(round) { mutableStateOf(ConnectFour()) }
@@ -255,7 +258,8 @@ fun ConnectFourScreen(onExit: () -> Unit) {
             finished -> GameStatus.Won("Full board", "A draw.")
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
         aspect = ConnectFour.COLUMNS.toFloat() / ConnectFour.ROWS,
@@ -361,6 +365,7 @@ data class Reversi(val cells: List<Int> = start()) {
 @Composable
 fun ReversiScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     var round by remember { mutableIntStateOf(0) }
     var board by remember(round) { mutableStateOf(Reversi()) }
     var best by remember { mutableIntStateOf(ArcadeScores.best(context, "reversi")) }
@@ -407,7 +412,8 @@ fun ReversiScreen(onExit: () -> Unit) {
 
             else -> GameStatus.Won("Dead heat", "${board.count(1)} apiece.")
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
     ) { boardModifier ->
@@ -449,6 +455,7 @@ fun ReversiScreen(onExit: () -> Unit) {
 @Composable
 fun NimScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     // Not the classic 1-3-5-7: that has a nim-sum of zero, which means the
@@ -495,7 +502,8 @@ fun NimScreen(onExit: () -> Unit) {
             !yourTurn -> GameStatus.Won("You took the last one", "Perfect play.")
             else -> GameStatus.Over("They took the last one", "Try leaving an even split.")
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
         aspect = 1.1f,
@@ -560,6 +568,7 @@ private fun buildQuestion(streak: Int, random: Random): Question {
 @Composable
 fun MathBlitzScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var streak by remember(round) { mutableIntStateOf(0) }
@@ -589,7 +598,8 @@ fun MathBlitzScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
@@ -693,6 +703,7 @@ private fun scoreGuess(guess: String, answer: String): List<Int> {
 @Composable
 fun WordGuessScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     val answer by remember(round) { mutableStateOf(WORD_LIST[random.nextInt(WORD_LIST.size)]) }
@@ -724,7 +735,8 @@ fun WordGuessScreen(onExit: () -> Unit) {
             exhausted -> GameStatus.Over("Out of guesses", "It was $answer.")
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
         aspect = 0.62f,

@@ -16,6 +16,8 @@ data class Ghost(
     /** Ticks left as edible; 0 means dangerous. */
     val frightened: Int = 0,
     val colorIndex: Int = 0,
+    /** Tick at which this ghost leaves the pen. They do not all leave at once. */
+    val releaseAt: Int = 0,
 )
 
 enum class ChompOutcome { Playing, Lost, Won }
@@ -36,6 +38,17 @@ data class ChompState(
 ) {
     val playing: Boolean get() = outcome == ChompOutcome.Playing
 
+    /** True while the ghosts are chasing rather than heading for their corner. */
+    val chasing: Boolean
+        get() {
+            var t = tick % PHASES.sumOf { it.first }
+            PHASES.forEach { (length, chase) ->
+                if (t < length) return chase
+                t -= length
+            }
+            return true
+        }
+
     companion object {
 
         /**
@@ -52,7 +65,7 @@ data class ChompState(
             "#.##.#.###.#.##.#",
             "#....#..#..#....#",
             "####.##.#.##.####",
-            "#......GGG......#",
+            "#.....GGGG......#",
             "####.##.#.##.####",
             "#.......#.......#",
             "#.##.##.#.##.##.#",
@@ -71,6 +84,22 @@ data class ChompState(
 
         /** How long a power pellet keeps the ghosts edible, in ticks. */
         const val FRIGHT_TICKS = 34
+
+        /**
+         * The scatter and chase phases of the original, in ticks.
+         *
+         * Pac-Man's ghosts do not hunt continuously: they alternate between
+         * chasing and retreating to their own corner, and the rhythm of that is
+         * what makes the game playable at all. Hunting from the first frame -
+         * which is what this did - costs the player two lives before they have
+         * touched the controls.
+         */
+        val PHASES = listOf(42 to false, 120 to true, 42 to false, 160 to true)
+
+        /** Each ghost's corner during scatter, in the cabinet's order. */
+        val SCATTER = listOf(
+            Cell(WIDTH - 2, 1), Cell(1, 1), Cell(WIDTH - 2, HEIGHT - 2), Cell(1, HEIGHT - 2),
+        )
 
         const val PELLET_POINTS = 10
         const val POWER_POINTS = 50
@@ -108,6 +137,9 @@ data class ChompState(
                         direction = if (index % 2 == 0) Direction.Left else Direction.Right,
                         home = cell,
                         colorIndex = index,
+                        // Staggered, so the first seconds are a chance to get
+                        // moving rather than an ambush.
+                        releaseAt = index * 26,
                     )
                 },
                 pellets = pellets,
@@ -152,7 +184,10 @@ data class ChompState(
         ghosts = if (tick % 4 == 3) {
             ghosts.map { it.copy(frightened = (it.frightened - 1).coerceAtLeast(0)) }
         } else {
-            ghosts.map { moveGhost(it, moved, random) }
+            ghosts.map { ghost ->
+                // A ghost still in its pen stays put until its release tick.
+                if (tick < ghost.releaseAt) ghost else moveGhost(ghost, moved, heading, random)
+            }
         }
 
         // Collisions are checked after both sides move, and again for the
@@ -201,21 +236,41 @@ data class ChompState(
      * Reversing is only allowed at a dead end, which is what keeps them moving
      * like patrols rather than jittering on the spot.
      */
-    private fun moveGhost(ghost: Ghost, player: Cell, random: Random): Ghost {
+    /**
+     * Each ghost aims at its own target square and takes whichever legal turn
+     * gets it closest, never reversing. That one rule, with four different
+     * targets, is the whole of the original's behaviour: they appear to have
+     * personalities because they are solving the same problem differently.
+     */
+    private fun targetFor(ghost: Ghost, player: Cell, heading: Direction): Cell = when {
+        // Frightened ghosts run for the corner furthest from the player.
+        ghost.frightened > 0 -> SCATTER.maxByOrNull { it.distanceTo(player) } ?: player
+        !chasing -> SCATTER[ghost.colorIndex % SCATTER.size]
+        else -> when (ghost.colorIndex % 4) {
+            // Blinky goes straight at you.
+            0 -> player
+            // Pinky aims four squares ahead, to cut you off.
+            1 -> Cell(player.x + heading.dx * 4, player.y + heading.dy * 4)
+            // Inky aims two ahead, doubled about Blinky - here approximated by
+            // aiming further ahead, which produces the same flanking effect.
+            2 -> Cell(player.x + heading.dx * 8, player.y + heading.dy * 8)
+            // Clyde chases until he is close, then loses his nerve.
+            else -> if (ghost.cell.distanceTo(player) > 6) player else SCATTER[3]
+        }
+    }
+
+    private fun moveGhost(ghost: Ghost, player: Cell, heading: Direction, random: Random): Ghost {
         val options = Direction.entries
             .filter { !isWall(ghost.cell.move(it)) }
             .filter { it != ghost.direction.opposite() }
             .ifEmpty { listOf(ghost.direction.opposite()) }
 
-        // A little randomness stops all ghosts from converging on one path and
-        // makes them beatable without being predictable.
-        val choice = if (random.nextInt(100) < 15) {
+        val target = targetFor(ghost, player, heading)
+        // A little randomness stops all four converging on one path.
+        val choice = if (random.nextInt(100) < 10) {
             options[random.nextInt(options.size)]
         } else {
-            options.minByOrNull { direction ->
-                val distance = ghost.cell.move(direction).distanceTo(player)
-                if (ghost.frightened > 0) -distance else distance
-            } ?: ghost.direction
+            options.minByOrNull { ghost.cell.move(it).distanceTo(target) } ?: ghost.direction
         }
         return ghost.copy(cell = ghost.cell.move(choice), direction = choice)
     }

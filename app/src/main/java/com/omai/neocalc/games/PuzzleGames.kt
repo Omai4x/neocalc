@@ -147,6 +147,7 @@ private fun tileColor(value: Int): Color = when (value) {
 @Composable
 fun Game2048Screen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var board by remember(round) { mutableStateOf(Board2048.new(random)) }
@@ -173,10 +174,11 @@ fun Game2048Screen(onExit: () -> Unit) {
             board.won -> GameStatus.Won("2048!", "Keep going if you like.")
             else -> null
         },
-        pad = Pad.Directional,
+        controls = Controls.Joystick,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
-        onDirection = ::push,
+        onStep = ::push,
     ) { boardModifier ->
         GameCanvas(boardModifier.swipeDirections(::push)) {
             val cell = size.width / Board2048.SIZE
@@ -273,6 +275,7 @@ data class MineField(
 @Composable
 fun MinesweeperScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var field by remember(round) { mutableStateOf(MineField.empty()) }
@@ -296,7 +299,8 @@ fun MinesweeperScreen(onExit: () -> Unit) {
             field.won -> GameStatus.Won("Field cleared", "Nicely deduced.")
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
     ) { boardModifier ->
@@ -354,6 +358,7 @@ fun MinesweeperScreen(onExit: () -> Unit) {
 @Composable
 fun LightsOutScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     val size = 5
     var round by remember { mutableIntStateOf(0) }
@@ -398,7 +403,8 @@ fun LightsOutScreen(onExit: () -> Unit) {
         } else {
             null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
     ) { boardModifier ->
@@ -443,6 +449,7 @@ fun LightsOutScreen(onExit: () -> Unit) {
 @Composable
 fun SlidePuzzleScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     val size = 4
     var round by remember { mutableIntStateOf(0) }
@@ -493,7 +500,8 @@ fun SlidePuzzleScreen(onExit: () -> Unit) {
         } else {
             null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
     ) { boardModifier ->
@@ -682,6 +690,7 @@ data class SokobanState(
 @Composable
 fun SokobanScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     var level by remember { mutableIntStateOf(0) }
     var state by remember(level) { mutableStateOf(SokobanState.load(level)) }
     var totalScore by remember { mutableIntStateOf(0) }
@@ -709,10 +718,11 @@ fun SokobanScreen(onExit: () -> Unit) {
             state.solved -> GameStatus.Won("Level clear", "Next one coming up…")
             else -> null
         },
-        pad = Pad.Directional,
+        controls = Controls.Joystick,
+        state = controls,
         onExit = onExit,
         onRestart = { state = SokobanState.load(level) },
-        onDirection = { state = state.push(it) },
+        onStep = { state = state.push(it) },
         extraAction = "Undo" to { state = state.undo() },
         aspect = state.width.toFloat() / state.height,
     ) { boardModifier ->
@@ -763,6 +773,7 @@ fun SokobanScreen(onExit: () -> Unit) {
 @Composable
 fun MemoryScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     val columns = 4
     val rows = 5
@@ -807,7 +818,8 @@ fun MemoryScreen(onExit: () -> Unit) {
         best = best,
         extra = "TURNS $turns",
         status = if (done) GameStatus.Won("All pairs found", "$turns turns.") else null,
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
         aspect = columns.toFloat() / rows,
@@ -858,6 +870,7 @@ fun MemoryScreen(onExit: () -> Unit) {
 @Composable
 fun SimonScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var sequence by remember(round) { mutableStateOf(listOf(random.nextInt(4))) }
@@ -902,7 +915,8 @@ fun SimonScreen(onExit: () -> Unit) {
             showing -> null
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
     ) { boardModifier ->
@@ -952,6 +966,7 @@ fun SimonScreen(onExit: () -> Unit) {
 @Composable
 fun FloodScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     val size = 9
     val palette = listOf(Arcade.Red, Arcade.Amber, Arcade.Green, Arcade.Sky, Arcade.Purple, Arcade.Pink)
@@ -1002,7 +1017,8 @@ fun FloodScreen(onExit: () -> Unit) {
             lost -> GameStatus.Over("Out of moves", "So close.")
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
         // One extra row for the palette, drawn as part of the board so the

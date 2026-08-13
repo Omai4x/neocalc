@@ -1,5 +1,9 @@
 package com.omai.neocalc.games
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableFloatStateOf
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -144,4 +148,49 @@ object Arcade {
 
     /** Distinct, in order, for anything that needs "the next colour". */
     val series = listOf(Red, Amber, Green, Sky, Purple, Pink, Teal, Lime, Blue, Coral)
+}
+
+/**
+ * How far the current tick has progressed, from 0 at the tick that just fired
+ * to 1 at the next one.
+ *
+ * Tile games move a whole cell at a time, which is correct for the rules and
+ * looks like a slideshow on screen. Drawing at the position between the last
+ * cell and the next one, using this as the fraction, turns the same logic into
+ * continuous motion without touching the logic at all.
+ *
+ * Reset by passing a [key] that changes on every tick, usually the tick counter.
+ */
+@Composable
+fun rememberTickProgress(key: Any, intervalMs: Long, running: Boolean): State<Float> {
+    // Returned as a State, not a Float, on purpose. A Float would be read during
+    // composition, so every frame of every animation would recompose the whole
+    // screen - which cost 30 to 70 dropped frames a second when measured. Read
+    // inside a draw lambda instead, only the drawing is invalidated.
+    val progress = remember { mutableFloatStateOf(1f) }
+    LaunchedEffect(key, running, intervalMs) {
+        if (!running) {
+            progress.floatValue = 1f
+            return@LaunchedEffect
+        }
+        progress.floatValue = 0f
+        val started = withFrameNanos { it }
+        while (progress.floatValue < 1f) {
+            withFrameNanos { now ->
+                progress.floatValue =
+                    ((now - started) / 1_000_000f / intervalMs).coerceIn(0f, 1f)
+            }
+        }
+    }
+    return progress
+}
+
+/** Linear interpolation between two grid cells, in cell units. */
+fun lerpCell(from: Cell, to: Cell, t: Float): Pair<Float, Float> {
+    // A wrap across the board is a teleport, not a slide: interpolating it
+    // would drag the sprite backwards across the whole screen.
+    val dx = to.x - from.x
+    val dy = to.y - from.y
+    if (kotlin.math.abs(dx) > 1 || kotlin.math.abs(dy) > 1) return to.x.toFloat() to to.y.toFloat()
+    return (from.x + dx * t) to (from.y + dy * t)
 }

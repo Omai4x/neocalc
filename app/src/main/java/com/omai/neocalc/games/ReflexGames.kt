@@ -83,6 +83,7 @@ data class StackWorld(
 @Composable
 fun StackScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     var round by remember { mutableIntStateOf(0) }
     var world by remember(round) { mutableStateOf(StackWorld()) }
     var paused by remember { mutableStateOf(false) }
@@ -106,8 +107,9 @@ fun StackScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Action,
-        labels = PadLabels(action = "DROP"),
+        controls = Controls.Action,
+        state = controls,
+        labels = ControlLabels(action = "DROP"),
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
@@ -119,6 +121,9 @@ fun StackScreen(onExit: () -> Unit) {
         GameCanvas(boardModifier.tapAnywhere { world = world.drop() }) {
             val unit = size.width
             val base = size.height - unit * 0.04f
+            // A dark ground so the stack reads as lit blocks against a night
+            // sky, which is how the phone version everyone knows looks.
+            drawRect(Color(0xFF10141C), size = size)
 
             // Only the top dozen rows are drawn; the tower is conceptually
             // infinite but the screen is not.
@@ -155,6 +160,7 @@ data class Target(
 @Composable
 fun SharpshooterScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var targets by remember(round) { mutableStateOf(listOf<Target>()) }
@@ -205,7 +211,8 @@ fun SharpshooterScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
@@ -265,6 +272,7 @@ fun SharpshooterScreen(onExit: () -> Unit) {
 @Composable
 fun MoleScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var up by remember(round) { mutableStateOf(mapOf<Int, Boolean>()) }
@@ -309,7 +317,8 @@ fun MoleScreen(onExit: () -> Unit) {
             paused -> GameStatus.Paused
             else -> null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++; paused = false },
         countdown = countdown,
@@ -364,6 +373,7 @@ private enum class ReflexPhase { Waiting, Ready, Scored, Early }
 @Composable
 fun ReactionScreen(onExit: () -> Unit) {
     val context = LocalContext.current
+    val controls = remember { ControlState() }
     val random = remember { Random(System.nanoTime()) }
     var round by remember { mutableIntStateOf(0) }
     var phase by remember(round) { mutableStateOf(ReflexPhase.Waiting) }
@@ -404,7 +414,8 @@ fun ReactionScreen(onExit: () -> Unit) {
         } else {
             null
         },
-        pad = Pad.Board,
+        controls = Controls.Board,
+        state = controls,
         onExit = onExit,
         onRestart = { round++ },
     ) { boardModifier ->
