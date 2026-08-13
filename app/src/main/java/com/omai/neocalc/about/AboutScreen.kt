@@ -1,5 +1,8 @@
 package com.omai.neocalc.about
 
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.WindowInsets
 import com.omai.neocalc.history.HistoryEntry
 import com.omai.neocalc.backup.Backup
 import com.omai.neocalc.R
@@ -74,7 +77,8 @@ fun AboutScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(scheme.background),
+            .background(scheme.background)
+            .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

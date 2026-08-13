@@ -99,12 +99,12 @@ fun CalculatorPreview() {
         Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = "128 ×",
-                fontSize = 10.5.sp,
+                fontSize = 14.sp,
                 color = scheme.onSurfaceVariant,
             )
             Text(
                 text = "1,024",
-                fontSize = 34.sp,
+                fontSize = 50.sp,
                 fontWeight = FontWeight.Light,
                 color = scheme.onSurface,
             )
@@ -119,15 +119,15 @@ fun CalculatorPreview() {
         )
         rows.forEach { row ->
             Row(
-                horizontalArrangement = Arrangement.spacedBy(3.dp),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 3.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
             ) {
                 row.forEach { key ->
                     val operator = key in listOf("÷", "×", "−", "+", "=")
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(20.dp)
+                            .height(38.dp)
                             .clip(RoundedCornerShape(6.dp))
                             .background(
                                 when {
@@ -140,7 +140,7 @@ fun CalculatorPreview() {
                     ) {
                         Text(
                             text = key,
-                            fontSize = 10.5.sp,
+                            fontSize = 15.sp,
                             fontWeight = if (operator) FontWeight.SemiBold else FontWeight.Normal,
                             color = when {
                                 key == "=" -> scheme.onPrimary

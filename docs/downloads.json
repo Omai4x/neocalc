@@ -1,37 +1,48 @@
 {
   "_comment": "The only file to edit when shipping. Builds are attached to the matching GitHub release, so the URLs follow one pattern: https://github.com/Omai4x/neocalc/releases/download/v<version>/<file>. Bump version and released, point the urls at the new tag, and the page updates itself: heading, buttons, sizes and changelog.",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "released": "2026-08-13",
   "minAndroid": "6.0",
-  "headline": "Fixes a crash on launch.",
+  "headline": "Nothing hides under the system bars any more.",
   "builds": [
     {
       "label": "Most phones",
       "arch": "arm64-v8a",
       "size": "14 MB",
       "recommended": true,
-      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3.1/NeoCalc-1.3.1-arm64-v8a.apk"
+      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3.2/NeoCalc-1.3.2-arm64-v8a.apk"
     },
     {
       "label": "Older 32-bit phones",
       "arch": "armeabi-v7a",
       "size": "10 MB",
       "recommended": false,
-      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3.1/NeoCalc-1.3.1-armeabi-v7a.apk"
+      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3.2/NeoCalc-1.3.2-armeabi-v7a.apk"
     },
     {
       "label": "Every architecture",
       "arch": "universal",
       "size": "43 MB",
       "recommended": false,
-      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3.1/NeoCalc-1.3.1-universal.apk"
+      "url": "https://github.com/Omai4x/neocalc/releases/download/v1.3.2/NeoCalc-1.3.2-universal.apk"
     }
   ],
   "changes": [
-    "1.3 could not start at all once it was minified for release: the optimiser removed a class that the background scheduler looks up by name, and the app died before drawing a frame. It is kept now.",
-    "Rate alerts would have failed the same way even after launching, because the worker is also found by name. Also kept."
+    "The Next button on the welcome tour sat on top of the gesture bar, and the title bar sat under the clock. The app draws edge to edge but was never insetting anything; now every screen keeps its controls clear of the system bars.",
+    "The app icon was still the cyan and violet of the palette this app had before the redesign. It is now warm black with one orange key, like the keypad it opens.",
+    "The calculator shown on the welcome tour was mostly empty space. Rebalanced so it looks like the app it is illustrating."
   ],
   "history": [
+    {
+      "version": "1.3.2",
+      "date": "13 August 2026",
+      "headline": "Nothing hides under the system bars any more.",
+      "changes": [
+        "The Next button on the welcome tour sat on top of the gesture bar, and the title bar sat under the clock. The app draws edge to edge but was never insetting anything; now every screen keeps its controls clear of the system bars.",
+        "The app icon was still the cyan and violet of the palette this app had before the redesign. It is now warm black with one orange key, like the keypad it opens.",
+        "The calculator shown on the welcome tour was mostly empty space. Rebalanced so it looks like the app it is illustrating."
+      ]
+    },
     {
       "version": "1.3.1",
       "date": "13 August 2026",

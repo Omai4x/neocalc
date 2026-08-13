@@ -1,5 +1,8 @@
 package com.omai.neocalc.games
 
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.WindowInsets
 import com.omai.neocalc.ui.LocalWindowSize
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.activity.compose.BackHandler
@@ -386,7 +389,10 @@ fun ArcadeScreen(onExit: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            // No Scaffold here, so the d-pad would otherwise sit on the gesture
+            // bar and the close button under the clock.
+            .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         when {
             entry == null -> GameHub(onPick = { openKey = it.key }, onExit = onExit)

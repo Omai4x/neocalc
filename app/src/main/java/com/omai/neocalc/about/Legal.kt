@@ -141,6 +141,16 @@ object ReleaseNotes {
 
     val ALL: List<Release> = listOf(
         Release(
+            version = "1.3.2",
+            date = "13 August 2026",
+            headline = "Nothing hides under the system bars any more.",
+            changes = listOf(
+                "The Next button on the welcome tour sat on top of the gesture bar, and the title bar sat under the clock. The app draws edge to edge but was never insetting anything; now every screen keeps its controls clear of the system bars.",
+                "The app icon was still the cyan and violet of the palette this app had before the redesign. It is now warm black with one orange key, like the keypad it opens.",
+                "The calculator shown on the welcome tour was mostly empty space. Rebalanced so it looks like the app it is illustrating.",
+            ),
+        ),
+        Release(
             version = "1.3.1",
             date = "13 August 2026",
             headline = "Fixes a crash on launch.",

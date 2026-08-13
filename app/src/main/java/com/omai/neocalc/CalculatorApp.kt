@@ -1,5 +1,10 @@
 package com.omai.neocalc
 
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.WindowInsets
 import com.omai.neocalc.ui.WindowSize
 import com.omai.neocalc.ui.LocalWindowSize
 import com.omai.neocalc.smart.Understood
@@ -148,6 +153,11 @@ fun CalculatorApp(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
+                    // TopAppBar would inset itself; a plain Row in the topBar
+                    // slot does not, so without this the title sits under the
+                    // clock. Only the top edge: the bottom belongs to the
+                    // navigation bar, which handles its own.
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                     .padding(start = 20.dp, end = 8.dp, top = 6.dp),
             ) {
                 Text(

@@ -1,5 +1,8 @@
 package com.omai.neocalc.onboarding
 
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.WindowInsets
 import com.omai.neocalc.ui.motionDuration
 import com.omai.neocalc.ui.LocalWindowSize
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -191,7 +194,11 @@ fun OnboardingScreen(onFinish: () -> Unit, modifier: Modifier = Modifier) {
                 Brush.verticalGradient(
                     listOf(accent.copy(alpha = 0.16f), scheme.background, scheme.background),
                 ),
-            ),
+            )
+            // The gradient is drawn edge to edge on purpose; only the content
+            // is inset, so colour still runs under the bars but nothing
+            // tappable does.
+            .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         Row(
             modifier = Modifier
